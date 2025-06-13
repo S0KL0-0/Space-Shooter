@@ -2,9 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <link rel="stylesheet" href="styles.css">
+    <title>Ship Designer</title>
 </head>
 <body>
-ship
+
+<div id="sidebar">
+    <div id="toolbar">
+        <div class="tool-icon active" id="mouse-tool" title="Move Tool">🖱️</div>
+        <div class="tool-icon" id="trash-tool" title="Delete Tool">🗑️</div>
+    </div>
+
+    <h3>Ship Components</h3>
+    <div id="components-container">
+        <!-- Components will be dynamically added here -->
+    </div>
+</div>
+
+<div id="grid-container">
+    <div id="ship-grid"></div>
+</div>
+
+<script src="logic.js"></script>
+
 </body>
 </html>
