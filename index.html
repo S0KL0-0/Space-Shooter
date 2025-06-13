@@ -3,8 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-gg
+<div class="menu-container">
+    <button class="menu-button" onclick="navigateTo('start')">Start</button>
+    <button class="menu-button" onclick="navigateTo('ship')">Ship</button>
+    <button class="menu-button" onclick="navigateTo('settings')">Settings</button>
+    <button class="menu-button quit-button" onclick="quitApp()">Quit</button>
+</div>
+
+<script>
+    function navigateTo(page) {
+        // Navigate to different pages
+        switch(page) {
+            case 'start':
+                window.location.href = 'Pages/Game/game.html';
+                break;
+            case 'ship':
+                window.location.href = 'Pages/Ship/ship.html';
+                break;
+            case 'settings':
+                window.location.href = 'Pages/Settings/settings.html';
+                break;
+        }
+    }
+
+    function quitApp() {
+        // For Electron app
+        if (typeof require !== 'undefined') {
+            const { ipcRenderer } = require('electron');
+            ipcRenderer.send('quit-app');
+        } else {
+            // Fallback for browser
+            window.close();
+        }
+    }
+</script>
 </body>
 </html>
