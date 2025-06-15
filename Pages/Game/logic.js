@@ -11,6 +11,8 @@ document.getElementById('game-container').appendChild(app.view);
 // Game settings
 const FPS = 60;
 const frameTime = 1000 / FPS;
+let mouseX = 0;
+let mouseY = 0;
 
 // Game states
 let gameState = 'waiting'; // waiting, countdown, playing
@@ -76,6 +78,12 @@ function startGame() {
 
     app.stage.addChild(playerShip);
 
+    app.view.addEventListener('mousemove', function(event) {
+        const rect = app.view.getBoundingClientRect();
+        mouseX = event.clientX - rect.left;
+        mouseY = event.clientY - rect.top;
+    });
+
     // Start main game loop
     requestAnimationFrame(gameLoop);
 }
@@ -92,42 +100,18 @@ function gameLoop(currentTime) {
 }
 
 
-function RotateShip(event){
 
+function update() {
     if (gameState !== 'playing') return;
 
-    const rect = app.view.getBoundingClientRect();
-
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-
+    // Calculate angle and rotate ship
     const xDiff = mouseX - playerShip.x;
     const yDiff = mouseY - playerShip.y;
     const angle = Math.atan2(yDiff, xDiff);
 
     playerShip.rotation = angle;
-}
 
-app.view.addEventListener('mousemove', RotateShip);
-
-function update() {
 
 }
 
-// Add click event listener for coordinates
-app.view.addEventListener('mousemove', handleGameClick);
-
-function handleGameClick(event) {
-    if (gameState !== 'playing') return;
-
-    // Get the canvas bounding rect to handle any scaling/positioning
-    const rect = app.view.getBoundingClientRect();
-
-    // Calculate coordinates relative to the canvas
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-
-    console.log(`Clicked at: X=${Math.round(x)}, Y=${Math.round(y)}`);
-}
 
