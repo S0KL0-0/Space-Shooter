@@ -1,4 +1,4 @@
-const gridSize = 8;
+const gridSize = 9;
 let shipData = {};
 let currentTool = 'mouse';
 
@@ -65,6 +65,10 @@ function createGrid() {
     const grid = document.getElementById('ship-grid');
     grid.innerHTML = '';
 
+    // Set grid size
+    grid.style.gridTemplateColumns = `repeat(${gridSize}, 40px)`;
+    grid.style.gridTemplateRows = `repeat(${gridSize}, 40px)`;
+
     for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
             const cell = document.createElement('div');
@@ -87,6 +91,10 @@ function handleToolClick(e) {
     document.querySelectorAll('.tool-icon').forEach(icon => icon.classList.remove('active'));
     e.currentTarget.classList.add('active');
     currentTool = e.currentTarget.id === 'mouse-tool' ? 'mouse' : 'trash';
+}
+
+function handlePlayClick() {
+    window.location.href = './Game/game.html';
 }
 
 function handleCellClick(e) {
@@ -322,6 +330,7 @@ async function loadShipData() {
 // Setup event listeners
 document.getElementById('mouse-tool').addEventListener('click', handleToolClick);
 document.getElementById('trash-tool').addEventListener('click', handleToolClick);
+document.getElementById('play-button').addEventListener('click', handlePlayClick);
 
 // Initialize everything
 async function init() {

@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "reactor_basic",
+    "name": "Basic Reactor",
+    "image": "Images/Reactors/reactor_basic.png",
+    "stats": {
+      "HP": 250,
+      "DEFENSE": 40,
+      "ENERGY-CAPACITY": 100,
+      "ENERGY-REGENERATION": 20,
+      "ENERGY-COOLDOWN": 300
+    },
+    "placement_rules": {
+      "rotation": false,
+      "maxValue": 1
+    }
+  }
+]
