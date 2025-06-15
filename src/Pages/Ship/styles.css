@@ -1,0 +1,153 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: #1a1a1a;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    min-height: 100vh;
+}
+
+#sidebar {
+    width: 200px;
+    background: #2a2a2a;
+    border-right: 2px solid #555;
+    padding: 20px;
+}
+
+#toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #555;
+}
+
+.tool-icon {
+    width: 40px;
+    height: 40px;
+    background: #444;
+    border: 2px solid #666;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.tool-icon.active {
+    background: #555;
+    border-color: #888;
+}
+
+.tool-icon:hover {
+    background: #555;
+}
+
+#grid-container {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#ship-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 40px);
+    grid-template-rows: repeat(8, 40px);
+    gap: 2px;
+    border: 2px solid #555;
+    border-radius: 8px;
+    padding: 10px;
+    background: #333;
+}
+
+.grid-cell {
+    width: 40px;
+    height: 40px;
+    background: #444;
+    border: 1px solid #666;
+    border-radius: 4px;
+    position: relative;
+}
+
+.grid-cell.occupied {
+    background: #555;
+}
+
+.grid-cell.drag-over {
+    background: #666;
+    border-color: #888;
+}
+
+.element {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 2px;
+    user-select: none;
+    background: transparent;
+}
+
+.element:active {
+    cursor: grabbing;
+}
+
+.element img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none; /* Prevents the drag element from targeting the image instead of the div containing it */
+    user-select: none;
+}
+
+.sidebar-element-container {
+    position: relative;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.sidebar-element {
+    width: 80px;
+    height: 36px;
+    position: relative;
+    background: #444;
+    border: 1px solid #666;
+}
+
+.element-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff6600;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+h3 {
+    margin-bottom: 15px;
+    color: #ccc;
+}
+
+.error-fallback {
+    background: #ff4444;
+    color: white;
+    font-size: 10px;
+    text-align: center;
+    padding: 2px;
+}

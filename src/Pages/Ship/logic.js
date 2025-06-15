@@ -2,14 +2,7 @@ const gridSize = 8;
 let shipData = {};
 let currentTool = 'mouse';
 
-const components = [
-    { name: 'reactor', displayName: 'RCT', image: '../../ShipModules/Images/Player/Player_Reactor.png', maxValue: 1},
-    { name: 'engine', displayName: 'ENG', image: '../../ShipModules/Images/Player/Engine.png', maxValue: 2},
-    { name: 'weapon', displayName: 'WPN', image: '../../ShipModules/Images/Player/Weapon.png', maxValue: 2},
-    { name: 'hull', displayName: 'HLL', image: '../../ShipModules/Images/Player/Hull.png', maxValue: 10},
-    { name: 'armor', displayName: 'SHD', image: '../../ShipModules/Images/Player/Armor.png', maxValue: 4},
-    { name: 'shield', displayName: 'CGO', image: '../../ShipModules/Images/Player/Shield_Block.png', maxValue: 2}
-];
+let components;
 
 // https://www.pixilart.com/
 
@@ -294,8 +287,18 @@ function saveShipData() {
 
 }
 
-function loadShipData() {
+async function loadShipData() {
+    const jsonData = await window.electronAPI.loadJSON('Data/player_ship.json');
+    console.log('Loaded JSON data:', jsonData);
 
+    // TODO: Add some data verifying
+
+    if (jsonData && Array.isArray(jsonData)) {
+        components = jsonData;
+    } else {
+        console.error('Failed to load components data or data is not an array');
+        components = [];
+    }
 }
 
 // Setup event listeners
@@ -303,11 +306,11 @@ document.getElementById('mouse-tool').addEventListener('click', handleToolClick)
 document.getElementById('trash-tool').addEventListener('click', handleToolClick);
 
 // Initialize everything
-function init() {
+async function init() {
+    await loadShipData(); // Load player data if there is any
     initInventory();
     createSidebarComponents();
     createGrid();
-    loadShipData();
     updateGrid();
     updateInventory();
 }

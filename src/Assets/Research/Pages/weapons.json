@@ -1,0 +1,30 @@
+[
+  {
+    "id": "weapon_blaster",
+    "name": "Blaster",
+    "path": "Assets/Images/Weapons/weapon_blaster.png",
+    "price": 0,
+    "unlocks": ["weapon_plasma-cannon", "weapon_scorpion"]
+  },
+  {
+    "id": "weapon_plasma-cannon",
+    "name": "Plasma Cannon",
+    "path": "Assets/Images/Weapons/weapon_plasma-cannon.png",
+    "price": 100,
+    "unlocks": ["weapon_flak-cannon"]
+  },
+  {
+    "id": "weapon_scorpion",
+    "name": "Scorpion",
+    "path": "Assets/Images/Weapons/weapon_scorpion.png",
+    "price": 120,
+    "unlocks": []
+  },
+  {
+    "id": "weapon_flak-cannon",
+    "name": "Flak Cannon",
+    "path": "Assets/Images/Weapons/weapon_flak-cannon.png",
+    "price": 150,
+    "unlocks": []
+  }
+]

@@ -1,0 +1,97 @@
+Naming/ID {
+
+    markings {
+        [] -> insert
+        '' -> use
+    }
+
+    Data Naming {
+        [namespace] + ':' + [category] + '_' + [node/module name] + '_' + 'level' + [lvl]
+    }
+
+    Texture Naming {
+        [category] + [node/module name] + '.' + [image format (preferable 'png')]
+    }
+
+    examples {
+
+        Data {
+            research:weapon_cannon_level_1
+            module:weapon_cannon_level_1
+        }
+
+        Textures {
+            armor_basic.png
+            engine_basic.png
+            weapon_cannon.png
+        }
+
+    }
+
+    namespaces {
+        research
+        module
+    }
+
+    categories {
+        weapon
+        hull
+        armor
+        shield
+        reactor
+        engine
+    }
+}
+
+Defining Everything {
+    Player Data
+    - Stats:
+    -- Research Points
+    -- Played Game Stats
+    - Unlocked and Upgraded Research
+    - Ship Placement on the Grid from the Available Modules
+
+    Assets (Default data)
+    - All Modules and their Upgrades
+    - Default Modules
+    - Research Tree
+
+    Per Module Data
+    - Name/ID
+    - Stats:
+    -- HP
+    -- Defense (How much of the taken damage gets neutralized instead of directly going to HP)
+    -- Max Energy
+    -- Current Energy
+    -- Energy Regen
+    - Placement Rules
+
+    Research Tree
+    - Page Array:
+    -- Page Name/ID
+    -- Node Array:
+    --- Node Name/ID
+    --- Connected Nodes
+    --- Levels:
+    ---- Lvl 1:
+    ----- Price
+    ----- Module ID
+
+    Grid:
+    - 2D Array of Cells:
+    -- Cell:
+    --- Module Name/ID
+    --- Rotation
+}
+
+Json Formats {
+    Assets Folder (Defaults) {
+
+    }
+
+    Data Folder (Player Data) {
+
+    }
+}
+
+

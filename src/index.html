@@ -7,8 +7,7 @@
 </head>
 <body>
 <div class="menu-container">
-    <button class="menu-button" onclick="navigateTo('start')">Start</button>
-    <button class="menu-button" onclick="navigateTo('ship')">Ship</button>
+    <button class="menu-button" onclick="navigateTo('play')">Play</button>
     <button class="menu-button" onclick="navigateTo('settings')">Settings</button>
     <button class="menu-button quit-button" onclick="quitApp()">Quit</button>
 </div>
@@ -17,11 +16,8 @@
     function navigateTo(page) {
         // Navigate to different pages
         switch(page) {
-            case 'start':
-                window.location.href = 'Pages/Game/game.html';
-                break;
-            case 'ship':
-                window.location.href = 'Pages/Ship/ship.html';
+            case 'play':
+                window.location.href = 'Pages/Play/ship.html';
                 break;
             case 'settings':
                 window.location.href = 'Pages/Settings/settings.html';

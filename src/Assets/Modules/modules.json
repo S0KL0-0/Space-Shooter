@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Weapons",
+    "path": "Modules/weapons.json"
+  },
+  {
+    "name": "Hulls",
+    "path": "Modules/hulls.json"
+  },
+  {
+    "name": "Armors",
+    "path": "Modules/armors.json"
+  },
+  {
+    "name": "Shields",
+    "path": "Modules/shields.json"
+  },
+  {
+    "name": "Reactors",
+    "path": "Modules/reactors.json"
+  },
+  {
+    "name": "Engines",
+    "path": "Modules/engines.json"
+  }
+]

@@ -1,13 +1,17 @@
 {
   "name": "space-shooter",
   "version": "1.2.0",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder"
   },
   "keywords": [],
-  "authors": ["S0KL", "Duck", "ROGABC"],
+  "authors": [
+    "S0KL",
+    "Duck",
+    "ROGABC"
+  ],
   "description": "",
   "devDependencies": {
     "electron": "^36.4.0",

@@ -1,0 +1,3 @@
+Press Play game:
+1) Ship page where you can also access research
+2) press begin play to proceed to the game window
