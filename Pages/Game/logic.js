@@ -65,6 +65,17 @@ function startGame() {
     gameState = 'playing';
     countdownText.visible = false;
 
+
+    //Temporary sprite add player bult ship later
+    playerShip = PIXI.Sprite.from('../../ShipModules/Images/Player/Player_Reactor.png');
+
+    playerShip.x = app.screen.width / 2;  // 400
+    playerShip.y = app.screen.height / 2; // 300
+
+    playerShip.anchor.set(0.5);
+
+    app.stage.addChild(playerShip);
+
     // Start main game loop
     requestAnimationFrame(gameLoop);
 }
@@ -80,6 +91,43 @@ function gameLoop(currentTime) {
     requestAnimationFrame(gameLoop);
 }
 
+
+function RotateShip(event){
+
+    if (gameState !== 'playing') return;
+
+    const rect = app.view.getBoundingClientRect();
+
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    const xDiff = mouseX - playerShip.x;
+    const yDiff = mouseY - playerShip.y;
+    const angle = Math.atan2(yDiff, xDiff);
+
+    playerShip.rotation = angle;
+}
+
+app.view.addEventListener('mousemove', RotateShip);
+
 function update() {
 
 }
+
+// Add click event listener for coordinates
+app.view.addEventListener('mousemove', handleGameClick);
+
+function handleGameClick(event) {
+    if (gameState !== 'playing') return;
+
+    // Get the canvas bounding rect to handle any scaling/positioning
+    const rect = app.view.getBoundingClientRect();
+
+    // Calculate coordinates relative to the canvas
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+
+    console.log(`Clicked at: X=${Math.round(x)}, Y=${Math.round(y)}`);
+}
+
