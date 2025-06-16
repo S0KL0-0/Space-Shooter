@@ -10,8 +10,7 @@
       "THRUST": 10
     },
     "placement_rules": {
-      "rotation": true,
-      "maxValue": 2
+      "rotation": true
     }
   }
 ]

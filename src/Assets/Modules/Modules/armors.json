@@ -8,8 +8,7 @@
       "DEFENSE": 50
     },
     "placement_rules": {
-      "rotation": false,
-      "maxValue": 4
+      "rotation": false
     }
   }
 ]

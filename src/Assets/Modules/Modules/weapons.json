@@ -10,8 +10,7 @@
       "ENERGY-USE": 2
     },
     "placement_rules": {
-      "rotation": true,
-      "maxValue": 2
+      "rotation": true
     }
   },
   {
@@ -25,8 +24,7 @@
       "ENERGY-USE": 10
     },
     "placement_rules": {
-      "rotation": true,
-      "maxValue": 2
+      "rotation": true
     }
   },
   {
@@ -40,8 +38,7 @@
       "ENERGY-USE": 1
     },
     "placement_rules": {
-      "rotation": true,
-      "maxValue": 2
+      "rotation": true
     }
   },
   {
@@ -55,8 +52,7 @@
       "ENERGY-USE": 20
     },
     "placement_rules": {
-      "rotation": true,
-      "maxValue": 2
+      "rotation": true
     }
   }
 ]

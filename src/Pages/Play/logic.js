@@ -11,7 +11,9 @@ let inventory = {};
 // Initialize inventory from components
 function initInventory() {
     components.forEach(comp => {
-        inventory[comp.name] = comp.maxValue;
+        if (comp.maxValue > 0) {
+            inventory[comp.name] = comp.maxValue;
+        }
     });
 }
 
@@ -25,6 +27,9 @@ function createSidebarComponents() {
     container.innerHTML = '';
 
     components.forEach(comp => {
+
+        if (comp.maxValue === 0) return;
+
         const containerDiv = document.createElement('div');
         containerDiv.className = 'sidebar-element-container';
 

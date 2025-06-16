@@ -11,8 +11,7 @@
       "ENERGY-COOLDOWN": 300
     },
     "placement_rules": {
-      "rotation": false,
-      "maxValue": 1
+      "rotation": false
     }
   }
 ]

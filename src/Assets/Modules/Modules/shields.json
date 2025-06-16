@@ -11,8 +11,7 @@
       "SHIELD-REGENERATION": 1
     },
     "placement_rules": {
-      "rotation": true,
-      "maxValue": 2
+      "rotation": true
     }
   }
 ]
