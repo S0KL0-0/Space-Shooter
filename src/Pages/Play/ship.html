@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="research.css">
     <title>Ship Designer</title>
 </head>
 <body>
@@ -11,6 +12,7 @@
     <div id="toolbar">
         <div class="tool-icon active" id="mouse-tool" title="Move Tool">🖱️</div>
         <div class="tool-icon" id="trash-tool" title="Delete Tool">🗑️</div>
+        <div class="tool-icon" id="research-button" title="Research">🔬</div>
         <div class="tool-icon" id="play-button" title="Play Button">▶️️</div>
     </div>
 
@@ -21,11 +23,59 @@
 </div>
 
 <div id="grid-container">
+
     <div id="ship-grid"></div>
 </div>
 
-<script src="load.js"></script>
+<div id="research-overlay" class="overlay hidden">
+    <div class="overlay-content">
+        <div class="overlay-header">
+            <!-- Tabs will be inserted here instead of title -->
+            <div class="research-tabs-header">
+                <div class="tab-buttons">
+                    <!-- Tab buttons will be generated here -->
+                </div>
+            </div>
+            <button class="close-button" id="close-research">&times;</button>
+        </div>
+
+        <div class="research-main-content">
+            <!-- Tab contents will be generated here -->
+            <div class="tab-contents">
+                <!-- Individual tab content will be generated here -->
+                <svg id="research-tree" viewBox="0 0 1000 800">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7"
+                                refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#444444" />
+                        </marker>
+                        <marker id="arrowhead-active" markerWidth="10" markerHeight="7"
+                                refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#00ff41" />
+                        </marker>
+                    </defs>
+
+                    <g id="tier-labels"></g>
+                    <g id="connections"></g>
+                    <g id="nodes"></g>
+                </svg>
+            </div>
+
+            <!-- Info panel for selected research -->
+            <div class="research-info-panel" id="info-panel">
+                <div class="info-title">Select a Research Node</div>
+                <div class="info-description">Click on any research node to view details</div>
+                <div class="info-cost">Resources: 0</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="Load/modules.js"></script>
+<script src="Load/research.js"></script>
 <script src="logic.js"></script>
+<script src="research-manager.js"></script>
+<script src="research-tree.js"></script>
 
 </body>
 </html>

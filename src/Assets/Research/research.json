@@ -4,23 +4,7 @@
     "path": "Pages/weapons.json"
   },
   {
-    "name": "Hulls",
-    "path": "Pages/hulls.json"
-  },
-  {
     "name": "Armors",
     "path": "Pages/armors.json"
-  },
-  {
-    "name": "Shields",
-    "path": "Pages/shields.json"
-  },
-  {
-    "name": "Reactors",
-    "path": "Pages/reactors.json"
-  },
-  {
-    "name": "Engines",
-    "path": "Pages/engines.json"
   }
 ]

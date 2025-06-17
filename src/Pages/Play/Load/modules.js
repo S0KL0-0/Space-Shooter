@@ -10,7 +10,7 @@ async function loadModules(
 
         const playerData = await window.electronAPI.loadJSON(`${playerDataPath}/available_modules.json`);
 
-        console.log('available modules: ', playerData);
+        // console.log('available modules: ', playerData);
 
         if (!Array.isArray(modulesConfig)) {
             console.error('Modules config is not an array');
@@ -76,7 +76,7 @@ async function loadModules(
         });
 
         const modules = await Promise.all(modulePromises);
-        console.log('Loaded modules:', modules);
+        // console.log('Loaded modules:', modules);
         return modules;
 
     } catch (error) {

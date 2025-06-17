@@ -4,8 +4,6 @@ let currentTool = 'mouse';
 
 let components;
 
-// https://www.pixilart.com/
-
 let inventory = {};
 
 // Initialize inventory from components

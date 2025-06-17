@@ -1,0 +1,277 @@
+
+/* Research Overlay Styles */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.overlay.hidden {
+    display: none;
+}
+
+.overlay-content {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border-radius: 15px;
+    width: 90%;
+    height: 85%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 2px solid #4a90e2;
+}
+
+.overlay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 2px solid #34495e;
+    background: rgba(0,0,0,0.3);
+    border-radius: 15px 15px 0 0;
+}
+
+.research-tabs-header {
+    flex: 1;
+}
+
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.tab-button {
+    background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+    color: white;
+    border: 2px solid #4a90e2;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.tab-button:hover {
+    background: linear-gradient(135deg, #4a90e2 0%, #5dade2 100%);
+    transform: translateY(-2px);
+}
+
+.tab-button.active {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    border-color: #f39c12;
+}
+
+.close-button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-button:hover {
+    background: #c0392b;
+    transform: scale(1.1);
+}
+
+.research-main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.tab-contents {
+    flex: 3;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.tab-content {
+    display: none;
+    height: 100%;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-content h3 {
+    color: #f39c12;
+    margin-bottom: 15px;
+    font-size: 24px;
+    text-align: center;
+}
+
+/* Research Tree Container */
+.tree-container {
+    flex: 1;
+    border: 2px solid #34495e;
+    border-radius: 10px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+.research-tree {
+    width: 100%;
+    height: 100%;
+}
+
+/* Research Tree Node Styles */
+.research-node {
+    cursor: pointer;
+}
+
+.node-circle {
+    stroke-width: 3;
+    transition: all 0.3s ease;
+}
+
+.node-circle.researched {
+    fill: #27ae60;
+    stroke: #2ecc71;
+}
+
+.node-circle.available {
+    fill: #f39c12;
+    stroke: #e67e22;
+}
+
+.node-circle.locked {
+    fill: #7f8c8d;
+    stroke: #95a5a6;
+}
+
+.node-circle.auto-unlocked {
+    fill: #3498db;
+    stroke: #5dade2;
+}
+
+.node-circle:hover {
+    stroke-width: 4;
+    filter: brightness(1.2);
+}
+
+.node-text {
+    fill: white;
+    font-size: 10px;
+    font-weight: bold;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+}
+
+.connection-line {
+    stroke: #7f8c8d;
+    stroke-width: 2;
+    fill: none;
+}
+
+.connection-line.active {
+    stroke: #2ecc71;
+    stroke-width: 3;
+}
+
+.tier-label {
+    fill: #bdc3c7;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Info Panel Styles */
+.research-info-panel {
+    flex: 1;
+    background: rgba(0,0,0,0.4);
+    border-left: 2px solid #34495e;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 250px;
+    max-width: 300px;
+}
+
+.info-title {
+    color: #f39c12;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 2px solid #34495e;
+    padding-bottom: 10px;
+}
+
+.info-description {
+    color: #ecf0f1;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.info-cost {
+    color: #f1c40f;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    background: rgba(241,196,15,0.1);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #f1c40f;
+}
+
+.research-button {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: auto;
+}
+
+.research-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2ecc71 0%, #58d68d 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.research-button:disabled {
+    background: #7f8c8d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .research-main-content {
+        flex-direction: column;
+    }
+
+    .research-info-panel {
+        flex: none;
+        min-width: auto;
+        max-width: none;
+        border-left: none;
+        border-top: 2px solid #34495e;
+        max-height: 200px;
+    }
+
+    .tab-contents {
+        flex: none;
+        height: 400px;
+    }
+}
