@@ -1,0 +1,16 @@
+[
+  {
+    "id": "engine_basic",
+    "name": "Basic Engine",
+    "image": "Images/Engines/engine_basic.png",
+    "stats": {
+      "HP": 300,
+      "DEFENSE": 25,
+      "ENERGY-USE": 1,
+      "THRUST": 10
+    },
+    "placement_rules": {
+      "rotation": true
+    }
+  }
+]

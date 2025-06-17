@@ -1,0 +1,17 @@
+[
+  {
+    "id": "shield_basic",
+    "name": "Basic Shield",
+    "image": "Images/Shields/shield_basic.png",
+    "stats": {
+      "HP": 250,
+      "DEFENSE": 40,
+      "ENERGY-USE": 1,
+      "SHIELD-CAPACITY": 50,
+      "SHIELD-REGENERATION": 1
+    },
+    "placement_rules": {
+      "rotation": true
+    }
+  }
+]

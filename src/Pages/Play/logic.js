@@ -1,15 +1,8 @@
-const gridSize = 8;
+const gridSize = 9;
 let shipData = {};
 let currentTool = 'mouse';
 
-const components = [
-    { name: 'reactor', displayName: 'RCT', image: '../../ShipModules/Images/Player/Player_Reactor.png', maxValue: 1},
-    { name: 'engine', displayName: 'ENG', image: '../../ShipModules/Images/Player/Engine.png', maxValue: 2},
-    { name: 'weapon', displayName: 'WPN', image: '../../ShipModules/Images/Player/Weapon.png', maxValue: 2},
-    { name: 'hull', displayName: 'HLL', image: '../../ShipModules/Images/Player/Hull.png', maxValue: 10},
-    { name: 'armor', displayName: 'SHD', image: '../../ShipModules/Images/Player/Armor.png', maxValue: 4},
-    { name: 'shield', displayName: 'CGO', image: '../../ShipModules/Images/Player/Shield_Block.png', maxValue: 2}
-];
+let components;
 
 // https://www.pixilart.com/
 
@@ -18,7 +11,9 @@ let inventory = {};
 // Initialize inventory from components
 function initInventory() {
     components.forEach(comp => {
-        inventory[comp.name] = comp.maxValue;
+        if (comp.maxValue > 0) {
+            inventory[comp.name] = comp.maxValue;
+        }
     });
 }
 
@@ -32,6 +27,9 @@ function createSidebarComponents() {
     container.innerHTML = '';
 
     components.forEach(comp => {
+
+        if (comp.maxValue === 0) return;
+
         const containerDiv = document.createElement('div');
         containerDiv.className = 'sidebar-element-container';
 
@@ -72,6 +70,10 @@ function createGrid() {
     const grid = document.getElementById('ship-grid');
     grid.innerHTML = '';
 
+    // Set grid size
+    grid.style.gridTemplateColumns = `repeat(${gridSize}, 40px)`;
+    grid.style.gridTemplateRows = `repeat(${gridSize}, 40px)`;
+
     for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
             const cell = document.createElement('div');
@@ -94,6 +96,10 @@ function handleToolClick(e) {
     document.querySelectorAll('.tool-icon').forEach(icon => icon.classList.remove('active'));
     e.currentTarget.classList.add('active');
     currentTool = e.currentTarget.id === 'mouse-tool' ? 'mouse' : 'trash';
+}
+
+function handlePlayClick() {
+    window.location.href = './Game/game.html';
 }
 
 function handleCellClick(e) {
@@ -294,20 +300,49 @@ function saveShipData() {
 
 }
 
-function loadShipData() {
+async function loadShipData() {
+    const moduleData = await loadModules();
+    console.log(moduleData);
 
+    // Flatten all module data into a single components array
+    if (moduleData && Array.isArray(moduleData)) {
+        components = [];
+        moduleData.forEach(module => {
+            if (module.data && Array.isArray(module.data)) {
+                // Transform each component to match expected format
+                module.data.forEach(item => {
+                    const component = {
+                        name: item.id,
+                        displayName: item.name,
+                        maxValue: item.placement_rules.maxValue
+                    };
+
+                    if (item.image) {
+                        component.image = item.image;
+                    }
+
+                    components.push(component);
+                });
+
+            }
+        });
+    } else {
+        console.error('Failed to load modules data or data is not an array');
+        components = [];
+    }
 }
 
 // Setup event listeners
 document.getElementById('mouse-tool').addEventListener('click', handleToolClick);
 document.getElementById('trash-tool').addEventListener('click', handleToolClick);
+document.getElementById('play-button').addEventListener('click', handlePlayClick);
 
 // Initialize everything
-function init() {
+async function init() {
+    await loadShipData(); // Load player data if there is any
     initInventory();
     createSidebarComponents();
     createGrid();
-    loadShipData();
     updateGrid();
     updateInventory();
 }

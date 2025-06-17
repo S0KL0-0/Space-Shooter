@@ -1,0 +1,14 @@
+[
+  {
+    "id": "hull_basic",
+    "name": "Basic Hull",
+    "image": "Images/Hulls/hull_basic.png",
+    "stats": {
+      "HP": 200,
+      "DEFENSE": 20
+    },
+    "placement_rules": {
+      "rotation": false
+    }
+  }
+]

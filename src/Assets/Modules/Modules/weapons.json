@@ -1,0 +1,58 @@
+[
+  {
+    "id": "weapon_blaster",
+    "name": "Blaster",
+    "image": "Images/Weapons/weapon_blaster.png",
+    "stats": {
+      "HP": 100,
+      "DEFENSE": 5,
+      "COOLDOWN": 35,
+      "ENERGY-USE": 2
+    },
+    "placement_rules": {
+      "rotation": true
+    }
+  },
+  {
+    "id": "weapon_plasma-cannon",
+    "name": "Plasma Cannon",
+    "image": "Images/Weapons/weapon_plasma-cannon.png",
+    "stats": {
+      "HP": 300,
+      "DEFENSE": 20,
+      "COOLDOWN": 80,
+      "ENERGY-USE": 10
+    },
+    "placement_rules": {
+      "rotation": true
+    }
+  },
+  {
+    "id": "weapon_scorpion",
+    "name": "Scorpion",
+    "image": "Images/Weapons/weapon_scorpion.png",
+    "stats": {
+      "HP": 80,
+      "DEFENSE": 1,
+      "COOLDOWN": 8,
+      "ENERGY-USE": 1
+    },
+    "placement_rules": {
+      "rotation": true
+    }
+  },
+  {
+    "id": "weapon_flak-cannon",
+    "name": "Flak Cannon",
+    "image": "Images/Weapons/weapon_flak-cannon.png",
+    "stats": {
+      "HP": 400,
+      "DEFENSE": 30,
+      "COOLDOWN": 120,
+      "ENERGY-USE": 20
+    },
+    "placement_rules": {
+      "rotation": true
+    }
+  }
+]

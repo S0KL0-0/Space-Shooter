@@ -1,0 +1,26 @@
+[
+  {
+    "id": "armor_basic",
+    "amount": 4
+  },
+  {
+    "id": "engine_basic",
+    "amount": 2
+  },
+  {
+    "id": "hull_basic",
+    "amount": 8
+  },
+  {
+    "id": "armor_basic",
+    "amount": 4
+  },
+  {
+    "id": "reactor_basic",
+    "amount": 1
+  },
+  {
+    "id": "shield_basic",
+    "amount": 2
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "armor_basic",
+    "name": "Basic Armor",
+    "image": "Images/Armors/armor_basic.png",
+    "stats": {
+      "HP": 400,
+      "DEFENSE": 50
+    },
+    "placement_rules": {
+      "rotation": false
+    }
+  }
+]
