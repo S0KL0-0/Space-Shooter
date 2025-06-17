@@ -13,6 +13,10 @@ const FPS = 60;
 const frameTime = 1000 / FPS;
 let mouseX = 0;
 let mouseY = 0;
+const maxSpeed = 200;
+const acceleration = 0.5;
+const deceleration = 0.5;
+const dash = 0;
 
 // Game states
 let gameState = 'waiting'; // waiting, countdown, playing
