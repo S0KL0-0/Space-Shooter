@@ -94,6 +94,10 @@ class Research {
         );
     }
 
+    async updatePointsInJson(value) {
+        await window.electronAPI.updateJSON('Data/other.json', 'Points', value);
+    }
+
     researchNode(tabId, nodeId) {
         const node = this.nodes[tabId][nodeId];
 
@@ -104,6 +108,9 @@ class Research {
 
         this.updateNodeStatuses();
         this.render();
+
+        this.updatePointsInJson(this.playerResources);
+
         return true;
     }
 
