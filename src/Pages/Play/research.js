@@ -1,10 +1,8 @@
-class ResearchManager {
-    constructor(containerId, tabContainerId) {
-        this.containerId = containerId;
-        this.tabContainerId = tabContainerId;
+class Research {
+    constructor() {
         this.tabs = [];
         this.nodes = {};
-        this.playerResources = 1000;
+        this.playerResources = window.Points;
         this.selectedTab = null;
         this.selectedNode = null;
         this.currentTransform = { x: 0, y: 0, scale: 1 };
@@ -120,9 +118,7 @@ class ResearchManager {
     }
 
     formatNodeName(id) {
-        const name = window.moduleMap.get(id).name;
-        console.log("map name: ", name);
-        return name;
+        return name = window.moduleMap.get(id).name;
     }
 
     addTabButtons() {
@@ -525,9 +521,10 @@ class ResearchManager {
 
 async function initializeResearchOverlay() {
     researchData = await loadResearch();
-    console.log('Loaded Research: ', researchData);
+    console.log(researchData);
 
-    console.log('Module Map Loaded: ', window.moduleMap);
+    //console.log('Loaded Research: ', researchData);
+    //console.log('Module Map Loaded: ', window.moduleMap);
 
     const researchButton = document.getElementById('research-button');
     const researchOverlay = document.getElementById('research-overlay');

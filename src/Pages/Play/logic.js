@@ -300,7 +300,7 @@ function saveShipData() {
 
 async function loadShipData() {
     const moduleData = await loadModules();
-    console.log('Module Data: ', moduleData);
+    //console.log('Module Data: ', moduleData);
 
     // Flatten all module data into a single components array
     if (moduleData && Array.isArray(moduleData)) {
@@ -357,7 +357,10 @@ async function init() {
     updateGrid();
     updateInventory();
 
-    window.researchTree =  new ResearchManager('tab-contents', 'tab-buttons')
+    window.Points = await loadResearchPoints();
+    console.log("Points: ", window.Points);
+
+    window.researchTree =  new Research()
 
     initializeResearchOverlay();
 }

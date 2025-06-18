@@ -72,3 +72,24 @@ async function loadResearch(
         return [];
     }
 }
+
+async function loadResearchPoints(
+    playerDataPath = 'Data'
+) {
+    try {
+
+        const playerData = await window.electronAPI.loadJSON(`${playerDataPath}/other.json`);
+
+        // console.log('researched: ', playerData);
+
+        let ResearchPoints = 0;
+
+        if (playerData.Points) ResearchPoints = playerData.Points;
+
+        return ResearchPoints;
+
+    } catch (error) {
+        console.error('Failed to load research points:', error);
+        return [];
+    }
+}
