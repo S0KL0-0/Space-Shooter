@@ -21,7 +21,7 @@ body {
     margin: 15px auto;
     background: #333;
     color: white;
-    border: 2px solid #555;
+    border: 2px solid #333;
     border-radius: 8px;
     font-size: 18px;
     cursor: pointer;
@@ -35,13 +35,20 @@ body {
     transform: translateY(-2px);
 }
 
+
+/*
+ red - #cc3333
+ dark gray - #1a1a1a
+ gray - #333
+*/
+
 .menu-button:active {
     transform: translateY(0);
 }
 
 .quit-button {
     background: #cc3333;
-    border-color: #aa2222;
+    border-color: #cc3333;
 }
 
 .quit-button:hover {
