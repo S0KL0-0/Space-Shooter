@@ -1,0 +1,19 @@
+
+
+    N
+  /   \
+ N     N
+
+ Node Splits into 2 Paths
+ Can go Both Paths
+
+
+     N
+   /   \
+  N     N
+   \   /
+     N
+
+  Node Splits into 2 choices and the merges back,
+  Can only choose 1 choice
+

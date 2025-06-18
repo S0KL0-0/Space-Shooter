@@ -4,8 +4,6 @@ let currentTool = 'mouse';
 
 let components;
 
-// https://www.pixilart.com/
-
 let inventory = {};
 
 // Initialize inventory from components
@@ -302,7 +300,7 @@ function saveShipData() {
 
 async function loadShipData() {
     const moduleData = await loadModules();
-    console.log(moduleData);
+    //console.log('Module Data: ', moduleData);
 
     // Flatten all module data into a single components array
     if (moduleData && Array.isArray(moduleData)) {
@@ -326,10 +324,23 @@ async function loadShipData() {
 
             }
         });
+
     } else {
         console.error('Failed to load modules data or data is not an array');
         components = [];
     }
+
+    //window.moduleData = moduleData;
+
+    const moduleMap = new Map();
+
+    moduleData.forEach(category => {
+        category.data.forEach(item => {
+            moduleMap.set(item.id, item);
+        });
+    });
+
+    window.moduleMap = moduleMap;
 }
 
 // Setup event listeners
@@ -345,6 +356,13 @@ async function init() {
     createGrid();
     updateGrid();
     updateInventory();
+
+    window.Points = await loadResearchPoints();
+    //console.log("Points: ", window.Points);
+
+    window.researchTree =  new Research()
+
+    await initializeResearchOverlay();
 }
 
 // Run initialization when DOM is ready

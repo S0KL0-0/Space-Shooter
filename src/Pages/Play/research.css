@@ -1,0 +1,285 @@
+/* Research Overlay Styles */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.overlay.hidden {
+    display: none;
+}
+
+/*
+ red - #cc3333
+ dark gray - #1a1a1a
+ gray - #333
+ light gray - #555
+*/
+
+.overlay-content {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #333 100%);
+    border-radius: 15px;
+    width: 90%;
+    height: 85%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    border: 2px solid #cc3333;
+}
+
+.overlay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 2px solid #555;
+    background: rgba(0,0,0,0.5);
+    border-radius: 15px 15px 0 0;
+}
+
+.research-tabs-header {
+    flex: 1;
+}
+
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.tab-button {
+    background: linear-gradient(135deg, #333 0%, #555 100%);
+    color: white;
+    border: 2px solid #666;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.tab-button:hover {
+    background: linear-gradient(135deg, #555 0%, #777 100%);
+    border-color: #cc3333;
+    transform: translateY(-2px);
+}
+
+.tab-button.active {
+    background: linear-gradient(135deg, #cc3333 0%, #b52d2d 100%);
+    border-color: #cc3333;
+}
+
+.close-button {
+    background: #cc3333;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-button:hover {
+    background: #b52d2d;
+    transform: scale(1.1);
+}
+
+.research-main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.tab-contents {
+    flex: 3;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.tab-content {
+    display: none;
+    height: 100%;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-content h3 {
+    color: #cc3333;
+    margin-bottom: 15px;
+    font-size: 24px;
+    text-align: center;
+}
+
+/* Research Tree Container */
+.tree-container {
+    flex: 1;
+    border: 2px solid #555;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #1a1a1a;
+}
+
+.research-tree {
+    width: 100%;
+    height: 100%;
+}
+
+/* Research Tree Node Styles */
+/* THEASE ARE THE RESEARCH APLI*/
+.research-node {
+    cursor: pointer;
+}
+
+.node-circle {
+    stroke-width: 3;
+    transition: all 0.3s ease;
+}
+
+.node-circle.researched {
+    fill: #666;
+    stroke: #888;
+}
+
+.node-circle.available {
+    fill: #cc3333;
+    stroke: #ff4444;
+}
+
+.node-circle.locked {
+    fill: #333;
+    stroke: #555;
+}
+
+.node-circle.auto-unlocked {
+    fill: #777;
+    stroke: #999;
+}
+
+.node-circle:hover {
+    stroke-width: 4;
+    filter: brightness(1.3);
+}
+
+.node-text {
+    fill: white;
+    font-size: 10px;
+    font-weight: bold;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+}
+
+.connection-line {
+    stroke: #555;
+    stroke-width: 2;
+    fill: none;
+}
+
+.connection-line.active {
+    stroke: #cc3333;
+    stroke-width: 3;
+}
+
+.tier-label {
+    fill: #aaa;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Info Panel Styles */
+.research-info-panel {
+    flex: 1;
+    background: rgba(0,0,0,0.6);
+    border-left: 2px solid #555;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 250px;
+    max-width: 300px;
+}
+
+.info-title {
+    /* color: #cc3333;*/
+    color: #cc3333;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 2px solid #555;
+    padding-bottom: 10px;
+}
+
+.info-description {
+    color: #ccc;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.info-cost {
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    background: rgba(204,51,51,0.2);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #cc3333;
+}
+
+.research-button {
+    background: linear-gradient(135deg, #cc3333 0%, #b52d2d 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: auto;
+}
+
+.research-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #b52d2d 0%, #9e2626 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+
+.research-button:disabled {
+    background: #555;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .research-main-content {
+        flex-direction: column;
+    }
+
+    .research-info-panel {
+        flex: none;
+        min-width: auto;
+        max-width: none;
+        border-left: none;
+        border-top: 2px solid #555;
+        max-height: 200px;
+    }
+
+    .tab-contents {
+        flex: none;
+        height: 400px;
+    }
+}
