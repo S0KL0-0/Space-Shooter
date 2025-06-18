@@ -1,4 +1,3 @@
-
 /* Research Overlay Styles */
 .overlay {
     position: fixed;
@@ -6,27 +5,33 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: #1a1a1a;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
 }
 
 .overlay.hidden {
     display: none;
 }
 
+/*
+ red - #cc3333
+ dark gray - #1a1a1a
+ gray - #333
+ light gray - #555
+*/
+
 .overlay-content {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #333 100%);
     border-radius: 15px;
     width: 90%;
     height: 85%;
     max-width: 1200px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    border: 2px solid #4a90e2;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    border: 2px solid #cc3333;
 }
 
 .overlay-header {
@@ -34,8 +39,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    border-bottom: 2px solid #34495e;
-    background: rgba(0,0,0,0.3);
+    border-bottom: 2px solid #555;
+    background: rgba(0,0,0,0.5);
     border-radius: 15px 15px 0 0;
 }
 
@@ -49,9 +54,9 @@
 }
 
 .tab-button {
-    background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+    background: linear-gradient(135deg, #333 0%, #555 100%);
     color: white;
-    border: 2px solid #4a90e2;
+    border: 2px solid #666;
     border-radius: 8px;
     padding: 10px 20px;
     cursor: pointer;
@@ -60,17 +65,18 @@
 }
 
 .tab-button:hover {
-    background: linear-gradient(135deg, #4a90e2 0%, #5dade2 100%);
+    background: linear-gradient(135deg, #555 0%, #777 100%);
+    border-color: #cc3333;
     transform: translateY(-2px);
 }
 
 .tab-button.active {
-    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-    border-color: #f39c12;
+    background: linear-gradient(135deg, #cc3333 0%, #b52d2d 100%);
+    border-color: #cc3333;
 }
 
 .close-button {
-    background: #e74c3c;
+    background: #cc3333;
     color: white;
     border: none;
     border-radius: 50%;
@@ -82,7 +88,7 @@
 }
 
 .close-button:hover {
-    background: #c0392b;
+    background: #b52d2d;
     transform: scale(1.1);
 }
 
@@ -109,7 +115,7 @@
 }
 
 .tab-content h3 {
-    color: #f39c12;
+    color: #cc3333;
     margin-bottom: 15px;
     font-size: 24px;
     text-align: center;
@@ -118,10 +124,10 @@
 /* Research Tree Container */
 .tree-container {
     flex: 1;
-    border: 2px solid #34495e;
+    border: 2px solid #555;
     border-radius: 10px;
     overflow: hidden;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background: #1a1a1a;
 }
 
 .research-tree {
@@ -130,6 +136,7 @@
 }
 
 /* Research Tree Node Styles */
+/* THEASE ARE THE RESEARCH APLI*/
 .research-node {
     cursor: pointer;
 }
@@ -140,28 +147,28 @@
 }
 
 .node-circle.researched {
-    fill: #27ae60;
-    stroke: #2ecc71;
+    fill: #666;
+    stroke: #888;
 }
 
 .node-circle.available {
-    fill: #f39c12;
-    stroke: #e67e22;
+    fill: #cc3333;
+    stroke: #ff4444;
 }
 
 .node-circle.locked {
-    fill: #7f8c8d;
-    stroke: #95a5a6;
+    fill: #333;
+    stroke: #555;
 }
 
 .node-circle.auto-unlocked {
-    fill: #3498db;
-    stroke: #5dade2;
+    fill: #777;
+    stroke: #999;
 }
 
 .node-circle:hover {
     stroke-width: 4;
-    filter: brightness(1.2);
+    filter: brightness(1.3);
 }
 
 .node-text {
@@ -174,18 +181,18 @@
 }
 
 .connection-line {
-    stroke: #7f8c8d;
+    stroke: #555;
     stroke-width: 2;
     fill: none;
 }
 
 .connection-line.active {
-    stroke: #2ecc71;
+    stroke: #cc3333;
     stroke-width: 3;
 }
 
 .tier-label {
-    fill: #bdc3c7;
+    fill: #aaa;
     font-size: 14px;
     font-weight: bold;
 }
@@ -193,8 +200,8 @@
 /* Info Panel Styles */
 .research-info-panel {
     flex: 1;
-    background: rgba(0,0,0,0.4);
-    border-left: 2px solid #34495e;
+    background: rgba(0,0,0,0.6);
+    border-left: 2px solid #555;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -204,34 +211,35 @@
 }
 
 .info-title {
-    color: #f39c12;
+    /* color: #cc3333;*/
+    color: #cc3333;
     font-size: 20px;
     font-weight: bold;
     text-align: center;
-    border-bottom: 2px solid #34495e;
+    border-bottom: 2px solid #555;
     padding-bottom: 10px;
 }
 
 .info-description {
-    color: #ecf0f1;
+    color: #ccc;
     font-size: 14px;
     line-height: 1.5;
     text-align: center;
 }
 
 .info-cost {
-    color: #f1c40f;
+    color: #fff;
     font-size: 16px;
     font-weight: bold;
     text-align: center;
-    background: rgba(241,196,15,0.1);
+    background: rgba(204,51,51,0.2);
     padding: 10px;
     border-radius: 8px;
-    border: 1px solid #f1c40f;
+    border: 1px solid #cc3333;
 }
 
 .research-button {
-    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    background: linear-gradient(135deg, #cc3333 0%, #b52d2d 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -244,13 +252,13 @@
 }
 
 .research-button:hover:not(:disabled) {
-    background: linear-gradient(135deg, #2ecc71 0%, #58d68d 100%);
+    background: linear-gradient(135deg, #b52d2d 0%, #9e2626 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
 }
 
 .research-button:disabled {
-    background: #7f8c8d;
+    background: #555;
     cursor: not-allowed;
     opacity: 0.6;
 }
@@ -266,7 +274,7 @@
         min-width: auto;
         max-width: none;
         border-left: none;
-        border-top: 2px solid #34495e;
+        border-top: 2px solid #555;
         max-height: 200px;
     }
 
