@@ -27,7 +27,7 @@ class Research {
         this.render();
     }
 
-    addNode(id, tab, name, description, cost, position, prerequisites = [], customData = {}) {
+    addNode(id, tab, name, description, cost, position, prerequisites = [], customData = {}, status) {
         const node = {
             id,
             tab,
@@ -37,7 +37,8 @@ class Research {
             position,
             prerequisites,
             customData,
-            status: cost === 0 ? 'researched' : 'locked'
+            status: status ? 'researched' : (cost === 0 ? 'researched' : 'locked')
+            //status: cost === 0 ? 'researched' : 'locked'
         };
 
         this.nodes[tab][id] = node;
@@ -98,6 +99,10 @@ class Research {
         await window.electronAPI.updateJSON('Data/other.json', 'Points', value);
     }
 
+    async updateResearchedNodeInJson(nodeId, value) {
+        await window.electronAPI.updateJSON('Data/researched.json', nodeId, value);
+    }
+
     researchNode(tabId, nodeId) {
         const node = this.nodes[tabId][nodeId];
 
@@ -109,6 +114,7 @@ class Research {
         this.updateNodeStatuses();
         this.render();
 
+        this.updateResearchedNodeInJson(nodeId, 'researched')
         this.updatePointsInJson(this.playerResources);
 
         return true;
@@ -229,7 +235,9 @@ class Research {
                 nodeDescription,
                 nodeCost,
                 nodePosition,
-                nodeRequirements
+                nodeRequirements,
+                {},
+                item.researched
             );
         });
     }

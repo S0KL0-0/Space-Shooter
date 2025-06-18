@@ -1,3 +1,7 @@
+function isObject(val) {
+    return typeof val === 'object' && val !== null && !Array.isArray(val)
+}
+
 async function loadResearch(
     defaultAssetPath = 'Assets/Research',
     imgPath = '../../Assets/Modules/Modules',
@@ -16,14 +20,6 @@ async function loadResearch(
             return [];
         }
 
-        // Create a map for player data if playerData exists
-        const playerResearchMap = new Map();
-        if (playerData && Array.isArray(playerData)) {
-            playerData.forEach(item => {
-                playerResearchMap.set(item.id, item);
-            });
-        }
-
         // Load all research data
         const researchPromises = researchConfig.map(async (research) => {
             try {
@@ -40,9 +36,8 @@ async function loadResearch(
                     }
 
                     // Add player research status if available
-                    const playerResearch = playerResearchMap.get(item.id);
-                    if (playerResearch) {
-                        transformedItem.researched = playerResearch.researched ?? false;
+                    if (playerData && isObject(playerData)) {
+                        transformedItem.researched = playerData[item.id] === 'researched';
                     } else {
                         transformedItem.researched = false;
                     }

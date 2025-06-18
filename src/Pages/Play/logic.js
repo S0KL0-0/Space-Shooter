@@ -358,7 +358,7 @@ async function init() {
     updateInventory();
 
     window.Points = await loadResearchPoints();
-    console.log("Points: ", window.Points);
+    //console.log("Points: ", window.Points);
 
     window.researchTree =  new Research()
 
