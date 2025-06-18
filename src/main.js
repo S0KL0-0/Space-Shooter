@@ -34,6 +34,28 @@ ipcMain.handle('load-json', async (event, filePath) => {
     }
 });
 
+ipcMain.handle('update-json', async (event, filePath, item, data) => {
+    try {
+        // Resolve path relative to app directory
+        const fullPath = path.resolve(__dirname, filePath);
+
+        // Security check - ensure file is within app directory
+        if (!fullPath.startsWith(__dirname)) {
+            throw new Error('Access denied: File outside app directory');
+        }
+
+        const loadedData = await fs.readFile(fullPath, 'utf8');
+        const parsedData = JSON.parse(loadedData);
+
+        parsedData[item] = data;
+
+        await fs.writeFile(fullPath, JSON.stringify(parsedData, null, 2), 'utf8');
+
+    } catch (error) {
+        throw new Error(`Failed to load JSON: ${error.message}`);
+    }
+});
+
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {

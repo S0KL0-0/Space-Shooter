@@ -357,12 +357,14 @@ async function init() {
     updateGrid();
     updateInventory();
 
+    await window.electronAPI.updateJSON('Data/other.json', 'Points', 123);
+
     window.Points = await loadResearchPoints();
     console.log("Points: ", window.Points);
 
     window.researchTree =  new Research()
 
-    initializeResearchOverlay();
+    await initializeResearchOverlay();
 }
 
 // Run initialization when DOM is ready
