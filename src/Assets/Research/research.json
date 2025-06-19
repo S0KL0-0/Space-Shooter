@@ -12,10 +12,6 @@
     "path": "Pages/armors.json"
   },
   {
-    "name": "Shields",
-    "path": "Pages/shields.json"
-  },
-  {
     "name": "Reactors",
     "path": "Pages/reactors.json"
   },

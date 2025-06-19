@@ -12,10 +12,6 @@
     "path": "Modules/armors.json"
   },
   {
-    "name": "Shields",
-    "path": "Modules/shields.json"
-  },
-  {
     "name": "Reactors",
     "path": "Modules/reactors.json"
   },

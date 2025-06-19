@@ -12,10 +12,6 @@
     "path": "Upgrades/armors.json"
   },
   {
-    "name": "ShieldUpgrades",
-    "path": "Upgrades/shields.json"
-  },
-  {
     "name": "ReactorUpgrades",
     "path": "Upgrades/reactors.json"
   },

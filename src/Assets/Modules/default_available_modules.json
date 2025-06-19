@@ -18,9 +18,5 @@
   {
     "id": "reactor_basic",
     "amount": 1
-  },
-  {
-    "id": "shield_basic",
-    "amount": 2
   }
 ]
