@@ -139,24 +139,35 @@ function handleSidebarElementClick(e) {
     e.currentTarget.classList.add('selected');
 }
 
+// Modified handleGridElementClick to fix rotation logic
 function handleGridElementClick(e, elementType, x, y) {
     e.stopPropagation();
 
     const key = `${x},${y}`;
 
-    // If we have a selected element, handle placement/rotation
     if (selectedElement) {
         if (selectedElement.source === 'sidebar') {
             // Check if clicking on same type - rotate instead of replace
             if (shipData[key] && shipData[key].id === selectedElement.type) {
-                // Rotate the existing component
-                const currentRotation = shipData[key].rotation || 'UP';
-                const nextRotation = getNextRotation(currentRotation);
+                // Get component info to check if it can rotate
+                const component = window.allGameData?.modules?.get(selectedElement.type);
 
-                shipData[key] = {
-                    id: selectedElement.type,
-                    rotation: nextRotation
-                };
+                if (component && component.placement_rules && component.placement_rules.rotation === true) {
+                    // Can rotate - rotate the existing component
+                    const currentRotation = shipData[key].rotation || 'UP';
+                    const nextRotation = getNextRotation(currentRotation);
+
+                    shipData[key] = {
+                        id: selectedElement.type,
+                        rotation: nextRotation
+                    };
+                } else {
+                    // Cannot rotate - keep as NONE
+                    shipData[key] = {
+                        id: selectedElement.type,
+                        rotation: 'NONE'
+                    };
+                }
 
                 updateGrid();
                 saveShipData();
@@ -179,9 +190,15 @@ function handleGridElementClick(e, elementType, x, y) {
                 inventory[selectedElement.type]--;
             }
 
+            // Get component info to set proper rotation
+            const component = window.allGameData?.weapons?.get(selectedElement.type) ||
+                window.allGameData?.modules?.get(selectedElement.type);
+
+            const defaultRotation = (component && component.placement_rules && component.placement_rules.rotation === true) ? 'UP' : 'NONE';
+
             shipData[key] = {
                 id: selectedElement.type,
-                rotation: 'UP' // Default rotation when placing new
+                rotation: defaultRotation
             };
 
             updateGrid();
@@ -192,41 +209,38 @@ function handleGridElementClick(e, elementType, x, y) {
         } else if (selectedElement.source === 'grid') {
             // Check if clicking on same element - rotate it
             if (selectedElement.x === x && selectedElement.y === y) {
-                const currentRotation = shipData[key].rotation || 'UP';
-                const nextRotation = getNextRotation(currentRotation);
+                // Same element, same position - rotate it
+                const component = window.allGameData?.weapons?.get(selectedElement.type) ||
+                    window.allGameData?.modules?.get(selectedElement.type);
 
-                shipData[key] = {
-                    id: selectedElement.type,
-                    rotation: nextRotation
-                };
+                if (component && component.placement_rules && component.placement_rules.rotation === true) {
+                    const currentRotation = shipData[key].rotation || 'UP';
+                    const nextRotation = getNextRotation(currentRotation);
+
+                    shipData[key] = {
+                        id: selectedElement.type,
+                        rotation: nextRotation
+                    };
+                }
+                // If cannot rotate, do nothing (keep current rotation)
 
                 updateGrid();
                 saveShipData();
                 return;
             }
 
-            // Moving from grid - swap or move
-            const sourceKey = `${selectedElement.x},${selectedElement.y}`;
-            const sourceElement = shipData[sourceKey];
+            // Check if clicking on same element type but different position - do nothing
             const targetElement = shipData[key];
-
-            if (sourceElement && sourceElement.id === targetElement?.id) {
-                // Same element type - rotate target instead of swapping
-                const currentRotation = targetElement.rotation || 'UP';
-                const nextRotation = getNextRotation(currentRotation);
-
-                shipData[key] = {
-                    id: targetElement.id,
-                    rotation: nextRotation
-                };
-
+            if (targetElement && targetElement.id === selectedElement.type) {
+                // Same element type, different position - do nothing
                 clearSelection();
-                updateGrid();
-                saveShipData();
                 return;
             }
 
             // Different elements - swap them
+            const sourceKey = `${selectedElement.x},${selectedElement.y}`;
+            const sourceElement = shipData[sourceKey];
+
             shipData[sourceKey] = targetElement;
             shipData[key] = sourceElement;
 
@@ -270,16 +284,30 @@ function handleCellClick(e) {
                 const existingElement = shipData[key];
                 inventory[existingElement.id]++;
                 inventory[selectedElement.type]--;
+
+                // Get component info to set proper rotation
+                const component = window.allGameData?.weapons?.get(selectedElement.type) ||
+                    window.allGameData?.modules?.get(selectedElement.type);
+
+                const defaultRotation = (component && component.placement_rules && component.placement_rules.rotation === true) ? 'UP' : 'NONE';
+
                 shipData[key] = {
                     id: selectedElement.type,
-                    rotation: 'UP'
+                    rotation: defaultRotation
                 };
             } else {
                 // Place in empty cell
                 inventory[selectedElement.type]--;
+
+                // Get component info to set proper rotation
+                const component = window.allGameData?.weapons?.get(selectedElement.type) ||
+                    window.allGameData?.modules?.get(selectedElement.type);
+
+                const defaultRotation = (component && component.placement_rules && component.placement_rules.rotation === true) ? 'UP' : 'NONE';
+
                 shipData[key] = {
                     id: selectedElement.type,
-                    rotation: 'UP'
+                    rotation: defaultRotation
                 };
             }
 
@@ -413,6 +441,7 @@ function updateGrid() {
     });
 }
 
+// Modified saveShipData function
 function saveShipData() {
     // Create a 2D array representing the grid
     const shipGrid = [];
@@ -431,39 +460,43 @@ function saveShipData() {
         const componentData = shipData[key];
 
         if (componentData) {
-            // Handle both old format (string) and new format (object)
-            if (typeof componentData === 'string') {
-                shipGrid[y][x] = {
-                    id: componentData,
-                    rotation: 'UP' // Default for old data
-                };
-            } else {
-                shipGrid[y][x] = {
-                    id: componentData.id,
-                    rotation: componentData.rotation || 'UP'
-                };
+            const componentId = typeof componentData === 'string' ? componentData : componentData.id;
+            let rotation = typeof componentData === 'object' ? componentData.rotation : 'UP';
+
+            // Get component info to check if it can rotate
+            const component = window.allGameData?.weapons?.get(componentId) ||
+                window.allGameData?.modules?.get(componentId);
+
+            // Fix rotation logic: if component can't rotate, set to "NONE", otherwise ensure valid rotation
+            if (component && component.placement_rules && component.placement_rules.rotation === false) {
+                rotation = "NONE";
+            } else if (!rotation || rotation === "NONE") {
+                // If it can rotate but has no rotation or NONE, set to UP
+                rotation = "UP";
             }
+
+            shipGrid[y][x] = {
+                id: componentId,
+                rotation: rotation
+            };
         }
     });
 
-    // Save to file using the Electron API
-    const filePath = 'Data/Ship/ship.json';
+    // Save ship data
+    const shipFilePath = 'Data/Ship/ship.json';
 
-    // Use the saveJSON function from the Electron API
+    // Save both files
     if (window.electronAPI && window.electronAPI.saveJSON) {
-        window.electronAPI.saveJSON(filePath, shipGrid)
-            .then(() => {
-                //console.log('Ship data saved successfully to:', filePath);
-            })
+        // Save ship data
+        window.electronAPI.saveJSON(shipFilePath, shipGrid)
             .catch(error => {
                 console.error('Failed to save ship data:', error);
             });
+
     } else {
         console.error('electronAPI.saveJSON function not available');
     }
 
-    // Also log the ship data for debugging
-    //console.log('Ship grid:', shipGrid);
 }
 
 async function loadShipData() {
@@ -541,11 +574,38 @@ async function loadExistingShipData() {
             // Convert 2D array back to shipData object format
             shipData = {};
 
+            // Track how many of each component we're trying to place
+            const componentCounts = {};
+
             for (let y = 0; y < shipGrid.length; y++) {
                 for (let x = 0; x < shipGrid[y].length; x++) {
                     const cell = shipGrid[y][x];
                     if (cell && cell.id) {
                         const key = `${x},${y}`;
+
+                        // Check if this component exists in our current data
+                        const component = getComponent(cell.id);
+                        if (!component) {
+                            console.warn(`Skipping component ${cell.id} at ${key}: not found in current data`);
+                            continue;
+                        }
+
+                        // Check if this component is researched (has maxValue > 0)
+                        if (component.maxValue <= 0) {
+                            console.warn(`Skipping component ${cell.id} at ${key}: not researched or not available`);
+                            continue;
+                        }
+
+                        // Count how many of this component we're trying to place
+                        componentCounts[cell.id] = (componentCounts[cell.id] || 0) + 1;
+
+                        // Check if we're trying to place more than the maximum allowed
+                        if (componentCounts[cell.id] > component.maxValue) {
+                            console.warn(`Skipping component ${cell.id} at ${key}: exceeds maximum available amount (${component.maxValue})`);
+                            continue;
+                        }
+
+                        // All checks passed, add to shipData
                         shipData[key] = {
                             id: cell.id,
                             rotation: cell.rotation || 'UP' // Default to UP if no rotation specified
@@ -555,6 +615,7 @@ async function loadExistingShipData() {
             }
 
             //console.log('Converted shipData:', shipData);
+            //console.log('Component counts from loaded ship:', componentCounts);
             return true;
         }
     } catch (error) {

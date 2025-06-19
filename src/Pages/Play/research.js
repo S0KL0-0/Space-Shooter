@@ -103,6 +103,58 @@ class Research {
         await window.electronAPI.updateJSON('Data/researched.json', nodeId, value);
     }
 
+    async refreshShipBuilderData() {
+        try {
+            // Reload the data
+            const allData = await load();
+
+            // Update global data
+            window.allGameData = allData;
+            window.moduleMap = allData.modules;
+            window.upgradeMap = allData.upgrades;
+
+            // Update components array
+            if (allData && allData.modules && allData.modules instanceof Map) {
+                components = [];
+                allData.modules.forEach((moduleData, moduleId) => {
+                    const component = {
+                        name: moduleId,
+                        displayName: moduleData.name,
+                        maxValue: moduleData.placement_rules?.amount || 0,
+                        image: moduleData.image
+                    };
+                    components.push(component);
+                });
+            }
+
+            // Count how many of each component are currently placed on the grid
+            const placedComponents = {};
+            Object.values(shipData).forEach(componentData => {
+                const componentType = typeof componentData === 'string' ? componentData : componentData.id;
+                placedComponents[componentType] = (placedComponents[componentType] || 0) + 1;
+            });
+
+            // Update inventory based on new maxValues and placed components
+            components.forEach(comp => {
+                if (comp.maxValue > 0) {
+                    const placedCount = placedComponents[comp.name] || 0;
+                    inventory[comp.name] = Math.max(0, comp.maxValue - placedCount);
+                } else {
+                    inventory[comp.name] = 0;
+                }
+            });
+
+            // Refresh the UI
+            createSidebarComponents();
+            updateInventory();
+
+            console.log('Ship builder data refreshed after research');
+
+        } catch (error) {
+            console.error('Failed to refresh ship builder data:', error);
+        }
+    }
+
     researchNode(tabId, nodeId) {
         const node = this.nodes[tabId][nodeId];
 
@@ -114,8 +166,11 @@ class Research {
         this.updateNodeStatuses();
         this.render();
 
-        this.updateResearchedNodeInJson(nodeId, 'researched')
+        this.updateResearchedNodeInJson(nodeId, 'researched');
         this.updatePointsInJson(this.playerResources);
+
+        // Add this line to refresh ship builder data
+        this.refreshShipBuilderData();
 
         return true;
     }

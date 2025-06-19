@@ -27,15 +27,12 @@
     null,
     {
       "id": "weapon_blaster",
-      "rotation": "NONE"
-    },
-    {
-      "id": "weapon_plasma-cannon",
       "rotation": "UP"
     },
+    null,
     {
       "id": "weapon_blaster",
-      "rotation": "NONE"
+      "rotation": "UP"
     },
     null,
     null,
@@ -113,12 +110,12 @@
     null,
     {
       "id": "engine_basic",
-      "rotation": "NONE"
+      "rotation": "UP"
     },
     null,
     {
       "id": "engine_basic",
-      "rotation": "NONE"
+      "rotation": "UP"
     },
     null,
     null,
