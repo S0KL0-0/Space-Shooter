@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "id": "hull_basic",
+    "price": 0,
+    "requires": []
+  }
+]

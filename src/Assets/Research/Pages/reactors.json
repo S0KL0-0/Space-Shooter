@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "id": "reactor_basic",
+    "price": 0,
+    "requires": []
+  }
+]
