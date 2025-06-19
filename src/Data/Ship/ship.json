@@ -1,0 +1,140 @@
+[
+  [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  [
+    null,
+    null,
+    null,
+    {
+      "id": "weapon_blaster",
+      "rotation": "NONE"
+    },
+    null,
+    {
+      "id": "weapon_blaster",
+      "rotation": "NONE"
+    },
+    null,
+    null,
+    null
+  ],
+  [
+    null,
+    null,
+    null,
+    {
+      "id": "armor_basic",
+      "rotation": "NONE"
+    },
+    {
+      "id": "hull_basic",
+      "rotation": "NONE"
+    },
+    {
+      "id": "armor_basic",
+      "rotation": "NONE"
+    },
+    null,
+    null,
+    null
+  ],
+  [
+    null,
+    null,
+    null,
+    {
+      "id": "hull_basic",
+      "rotation": "NONE"
+    },
+    {
+      "id": "reactor_basic",
+      "rotation": "NONE"
+    },
+    {
+      "id": "hull_basic",
+      "rotation": "NONE"
+    },
+    null,
+    null,
+    null
+  ],
+  [
+    null,
+    null,
+    null,
+    {
+      "id": "armor_basic",
+      "rotation": "NONE"
+    },
+    {
+      "id": "hull_basic",
+      "rotation": "NONE"
+    },
+    {
+      "id": "armor_basic",
+      "rotation": "NONE"
+    },
+    null,
+    null,
+    null
+  ],
+  [
+    null,
+    null,
+    null,
+    {
+      "id": "engine_basic",
+      "rotation": "NONE"
+    },
+    null,
+    {
+      "id": "engine_basic",
+      "rotation": "NONE"
+    },
+    null,
+    null,
+    null
+  ],
+  [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ]
+]

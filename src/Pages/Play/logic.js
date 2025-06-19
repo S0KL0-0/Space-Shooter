@@ -1,6 +1,5 @@
 const gridSize = 9;
 let shipData = {};
-let currentTool = 'mouse';
 let selectedElement = null; // Track selected element
 
 let components;
@@ -86,22 +85,23 @@ function createGrid() {
     }
 }
 
-// Tool handlers
-function handleToolClick(e) {
-    document.querySelectorAll('.tool-icon').forEach(icon => icon.classList.remove('active'));
-    e.currentTarget.classList.add('active');
-    currentTool = e.currentTarget.id === 'mouse-tool' ? 'mouse' : 'research';
-    clearSelection();
-}
-
 function handlePlayClick() {
-    window.location.href = './Game/game.html';
+    constructShip().then(r => window.location.href = './Game/game.html');
 }
 
 function handleSidebarElementClick(e) {
     const elementType = e.currentTarget.dataset.type;
 
     if (!elementType || inventory[elementType] <= 0) {
+        return;
+    }
+
+    // Check if this element is already selected
+    if (selectedElement &&
+        selectedElement.type === elementType &&
+        selectedElement.source === 'sidebar') {
+        // If already selected, unselect it
+        clearSelection();
         return;
     }
 
@@ -333,7 +333,47 @@ function updateGrid() {
 }
 
 function saveShipData() {
-    //console.log('Ship data:', shipData);
+    // Create a 2D array representing the grid
+    const shipGrid = [];
+
+    // Initialize the 2D array with null values
+    for (let y = 0; y < gridSize; y++) {
+        shipGrid[y] = [];
+        for (let x = 0; x < gridSize; x++) {
+            shipGrid[y][x] = null;
+        }
+    }
+
+    // Fill the 2D array with ship data
+    Object.keys(shipData).forEach(key => {
+        const [x, y] = key.split(',').map(Number);
+        const componentType = shipData[key];
+
+        // Create component object with id and rotation
+        shipGrid[y][x] = {
+            id: componentType,
+            rotation: "NONE" // Currently no rotation system implemented
+        };
+    });
+
+    // Save to file using the Electron API
+    const filePath = 'Data/Ship/ship.json';
+
+    // Use the saveJSON function from the Electron API
+    if (window.electronAPI && window.electronAPI.saveJSON) {
+        window.electronAPI.saveJSON(filePath, shipGrid)
+            .then(() => {
+                console.log('Ship data saved successfully to:', filePath);
+            })
+            .catch(error => {
+                console.error('Failed to save ship data:', error);
+            });
+    } else {
+        console.error('electronAPI.saveJSON function not available');
+    }
+
+    // Also log the ship data for debugging
+    console.log('Ship grid:', shipGrid);
 }
 
 async function loadShipData() {
@@ -367,8 +407,13 @@ async function loadShipData() {
 }
 
 // Setup event listeners
-document.getElementById('mouse-tool').addEventListener('click', handleToolClick);
-document.getElementById('research-button').addEventListener('click', handleToolClick);
+document.getElementById('back-button').addEventListener('click', () => {
+    window.location.href = '../../index.html'; // Adjust path as needed
+});
+document.getElementById('research-button').addEventListener('click', () => {
+    document.getElementById('research-overlay').classList.remove('hidden');
+});
+
 document.getElementById('play-button').addEventListener('click', handlePlayClick);
 
 // Clear selection when clicking outside (only for grid selections)
@@ -393,10 +438,65 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// Load existing ship data from JSON file
+async function loadExistingShipData() {
+    try {
+        const shipGrid = await loadFile('Data/Ship/ship.json');
+        console.log('Loaded ship grid:', shipGrid);
+
+        if (shipGrid && Array.isArray(shipGrid)) {
+            // Convert 2D array back to shipData object format
+            shipData = {};
+
+            for (let y = 0; y < shipGrid.length; y++) {
+                for (let x = 0; x < shipGrid[y].length; x++) {
+                    const cell = shipGrid[y][x];
+                    if (cell && cell.id) {
+                        const key = `${x},${y}`;
+                        shipData[key] = cell.id;
+                    }
+                }
+            }
+
+            console.log('Converted shipData:', shipData);
+            return true;
+        }
+    } catch (error) {
+        console.log('No existing ship data found or error loading:', error);
+        // This is fine - we'll start with an empty ship
+        shipData = {};
+        return false;
+    }
+}
+
+function updateInventoryFromPlacedComponents() {
+    // Count how many of each component are placed on the grid
+    const placedComponents = {};
+
+    Object.values(shipData).forEach(componentType => {
+        placedComponents[componentType] = (placedComponents[componentType] || 0) + 1;
+    });
+
+    // Reduce inventory by the number of placed components
+    components.forEach(comp => {
+        if (comp.maxValue > 0) {
+            const placedCount = placedComponents[comp.name] || 0;
+            inventory[comp.name] = Math.max(0, comp.maxValue - placedCount);
+        }
+    });
+}
+
 // Initialize everything
 async function init() {
-    await loadShipData(); // Load all data using new load function
+
+    await loadShipData();
+
     initInventory();
+
+    await loadExistingShipData();
+    // Update inventory based on what's already placed on the grid
+    updateInventoryFromPlacedComponents();
+
     createSidebarComponents();
     createGrid();
     updateGrid();

@@ -56,6 +56,59 @@ ipcMain.handle('update-json', async (event, filePath, item, data) => {
     }
 });
 
+// Handle JSON saving (create or overwrite)
+ipcMain.handle('save-json', async (event, filePath, data) => {
+    try {
+        // Resolve path relative to app directory
+        const fullPath = path.resolve(__dirname, filePath);
+
+        // Security check - ensure file is within app directory
+        if (!fullPath.startsWith(__dirname)) {
+            throw new Error('Access denied: File outside app directory');
+        }
+
+        // Ensure directory exists
+        const dir = path.dirname(fullPath);
+        await fs.mkdir(dir, { recursive: true });
+
+        // Write JSON data to file (create or overwrite)
+        await fs.writeFile(fullPath, JSON.stringify(data, null, 2), 'utf8');
+
+    } catch (error) {
+        throw new Error(`Failed to save JSON: ${error.message}`);
+    }
+});
+
+// Handle PNG saving
+ipcMain.handle('save-png', async (event, filePath, base64Data) => {
+    try {
+        // Resolve path relative to app directory
+        const fullPath = path.resolve(__dirname, filePath);
+
+        // Security check - ensure file is within app directory
+        if (!fullPath.startsWith(__dirname)) {
+            throw new Error('Access denied: File outside app directory');
+        }
+
+        // Ensure directory exists
+        const dir = path.dirname(fullPath);
+        await fs.mkdir(dir, { recursive: true });
+
+        // Convert base64 string to Buffer
+        // The base64Data should be just the base64 string without the data URL prefix
+        const imageBuffer = Buffer.from(base64Data, 'base64');
+
+        // Write PNG data to file
+        await fs.writeFile(fullPath, imageBuffer);
+
+        console.log(`PNG saved successfully to: ${fullPath}`);
+
+    } catch (error) {
+        console.error(`Failed to save PNG: ${error.message}`);
+        throw new Error(`Failed to save PNG: ${error.message}`);
+    }
+});
+
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
