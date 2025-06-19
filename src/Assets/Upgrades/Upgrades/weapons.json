@@ -1,3 +1,12 @@
 [
-
+  {
+    "id": "upgrade_weapon_weapon_blaster_limit",
+    "for": "weapon_blaster",
+    "name": "Limit Upgrade",
+    "description": "Increase weapon blaster placing limit by 2",
+    "image": "Images/Weapons/weapon_blaster.png",
+    "effect": {
+      "placement_rules": {"amount": 2}
+    }
+  }
 ]

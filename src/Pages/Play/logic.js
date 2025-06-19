@@ -337,46 +337,33 @@ function saveShipData() {
 }
 
 async function loadShipData() {
-    const moduleData = await loadModules();
-    //console.log('Module Data: ', moduleData);
+    // Load all data using the new load function
+    const allData = await load();
+    console.log("All Data: ", allData);
 
-    // Flatten all module data into a single components array
-    if (moduleData && Array.isArray(moduleData)) {
+    // Convert modules Map to components array for compatibility
+    if (allData && allData.modules && allData.modules instanceof Map) {
         components = [];
-        moduleData.forEach(module => {
-            if (module.data && Array.isArray(module.data)) {
-                // Transform each component to match expected format
-                module.data.forEach(item => {
-                    const component = {
-                        name: item.id,
-                        displayName: item.name,
-                        maxValue: item.placement_rules.maxValue
-                    };
-
-                    if (item.image) {
-                        component.image = item.image;
-                    }
-
-                    components.push(component);
-                });
-            }
+        allData.modules.forEach((moduleData, moduleId) => {
+            const component = {
+                name: moduleId,
+                displayName: moduleData.name,
+                maxValue: moduleData.placement_rules?.amount || 0,
+                image: moduleData.image
+            };
+            components.push(component);
         });
     } else {
-        console.error('Failed to load modules data or data is not an array');
+        console.error('Failed to load modules data or data is not a Map');
         components = [];
     }
 
-    //window.moduleData = moduleData;
+    // Store the module map for other parts of the application
+    window.moduleMap = allData.modules;
+    window.upgradeMap = allData.upgrades
 
-    const moduleMap = new Map();
-
-    moduleData.forEach(category => {
-        category.data.forEach(item => {
-            moduleMap.set(item.id, item);
-        });
-    });
-
-    window.moduleMap = moduleMap;
+    // Store all data globally for other components
+    window.allGameData = allData;
 }
 
 // Setup event listeners
@@ -408,7 +395,7 @@ document.addEventListener('click', (e) => {
 
 // Initialize everything
 async function init() {
-    await loadShipData(); // Load player data if there is any
+    await loadShipData(); // Load all data using new load function
     initInventory();
     createSidebarComponents();
     createGrid();

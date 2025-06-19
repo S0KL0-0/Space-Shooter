@@ -5,6 +5,11 @@
     "requires": []
   },
   {
+    "id": "upgrade_weapon_weapon_blaster_limit",
+    "price": 50,
+    "requires": ["weapon_blaster"]
+  },
+  {
     "id": "weapon_plasma-cannon",
     "price": 100,
     "requires": ["weapon_blaster"]
