@@ -210,6 +210,27 @@ function applyResearchedUpgrades(moduleMap, upgradeMap) {
     return moduleMap;
 }
 
+function applyResearchedEffects(moduleMap, research) {
+    // Apply effects from researched items in the research tree
+    research.forEach(category => {
+        if (category.data && Array.isArray(category.data)) {
+            category.data.forEach(item => {
+                if (item.researched && item.for && item.effect) {
+                    const targetModule = moduleMap.get(item.for);
+                    if (targetModule) {
+                        console.log(`Applying research ${item.id} to module ${item.for}`);
+                        applyUpgradeEffect(targetModule, item.effect);
+                    } else {
+                        console.warn(`Research ${item.id} targets non-existent module ${item.for}`);
+                    }
+                }
+            });
+        }
+    });
+
+    return moduleMap;
+}
+
 async function load(
     defaultAssetPath = {
         modules: 'Assets/Modules',
@@ -253,8 +274,12 @@ async function load(
         //console.log("Modules with amounts:", modulesWithAmounts);
 
         // 4. Apply researched upgrades to modules
-        const finalModules = applyResearchedUpgrades(modulesWithAmounts, researchData.upgrades);
-        //console.log("Final modules with upgrades:", finalModules);
+        const modulesWithUpgrades = applyResearchedUpgrades(modulesWithAmounts, researchData.upgrades);
+        //console.log("Modules with upgrades:", modulesWithUpgrades);
+
+        // 5. Apply researched effects from the research tree
+        const finalModules = applyResearchedEffects(modulesWithUpgrades, researchData.research);
+        //console.log("Final modules with research effects:", finalModules);
 
         //console.log("---------------");
 

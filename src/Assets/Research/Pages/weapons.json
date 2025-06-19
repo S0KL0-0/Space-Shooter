@@ -12,16 +12,34 @@
   {
     "id": "weapon_plasma-cannon",
     "price": 100,
-    "requires": ["weapon_blaster"]
+    "requires": ["weapon_blaster"],
+    "for": "weapon_plasma-cannon",
+    "effect": {
+      "placement_rules": {
+        "amount": 1
+      }
+    }
   },
   {
     "id": "weapon_scorpion",
     "price": 120,
-    "requires": ["weapon_blaster"]
+    "requires": ["weapon_blaster"],
+    "for": "weapon_scorpion",
+    "effect": {
+      "placement_rules": {
+        "amount": 1
+      }
+    }
   },
   {
     "id": "weapon_flak-cannon",
     "price": 150,
-    "requires": ["weapon_plasma-cannon"]
+    "requires": ["weapon_plasma-cannon"],
+    "for": "weapon_flak-cannon",
+    "effect": {
+      "placement_rules": {
+        "amount": 1
+      }
+    }
   }
 ]
