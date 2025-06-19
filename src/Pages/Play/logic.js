@@ -1,6 +1,7 @@
 const gridSize = 9;
 let shipData = {};
 let currentTool = 'mouse';
+let selectedElement = null; // Track selected element
 
 let components;
 
@@ -33,7 +34,6 @@ function createSidebarComponents() {
 
         const element = document.createElement('div');
         element.className = `element sidebar-element ${comp.name}`;
-        element.draggable = true;
         element.dataset.type = comp.name;
 
         const img = document.createElement('img');
@@ -51,7 +51,7 @@ function createSidebarComponents() {
         };
 
         element.appendChild(img);
-        element.addEventListener('dragstart', handleDragStart);
+        element.addEventListener('click', handleSidebarElementClick);
 
         const countElement = document.createElement('div');
         countElement.className = 'element-count';
@@ -79,9 +79,6 @@ function createGrid() {
             cell.dataset.x = x;
             cell.dataset.y = y;
 
-            cell.addEventListener('dragover', handleDragOver);
-            cell.addEventListener('drop', handleDrop);
-            cell.addEventListener('dragleave', handleDragLeave);
             cell.addEventListener('click', handleCellClick);
 
             grid.appendChild(cell);
@@ -93,136 +90,173 @@ function createGrid() {
 function handleToolClick(e) {
     document.querySelectorAll('.tool-icon').forEach(icon => icon.classList.remove('active'));
     e.currentTarget.classList.add('active');
-    currentTool = e.currentTarget.id === 'mouse-tool' ? 'mouse' : 'trash';
+    currentTool = e.currentTarget.id === 'mouse-tool' ? 'mouse' : 'research';
+    clearSelection();
 }
 
 function handlePlayClick() {
     window.location.href = './Game/game.html';
 }
 
-function handleCellClick(e) {
-    if (currentTool !== 'trash') return;
+function handleSidebarElementClick(e) {
+    const elementType = e.currentTarget.dataset.type;
 
-    const x = parseInt(e.currentTarget.dataset.x);
-    const y = parseInt(e.currentTarget.dataset.y);
-    const key = `${x},${y}`;
-
-    if (shipData[key]) {
-        const elementType = shipData[key];
-        inventory[elementType]++;
-        delete shipData[key];
-        updateGrid();
-        updateInventory();
-        saveShipData();
+    if (!elementType || inventory[elementType] <= 0) {
+        return;
     }
+
+    // Clear previous selection
+    clearSelection();
+
+    // Select this element from sidebar
+    selectedElement = {
+        type: elementType,
+        source: 'sidebar'
+    };
+
+    // Visual feedback
+    e.currentTarget.classList.add('selected');
 }
 
-// Drag handlers
-function handleDragStart(e) {
-    if (currentTool !== 'mouse') {
-        e.preventDefault();
-        return;
-    }
+function handleGridElementClick(e, elementType, x, y) {
+    e.stopPropagation();
 
-    // Find the actual draggable element (might be parent if dragging from image)
-    let draggableElement = e.target;
-    if (!draggableElement.hasAttribute('data-type')) {
-        draggableElement = draggableElement.closest('[data-type]');
-    }
+    const key = `${x},${y}`;
 
-    if (!draggableElement || !draggableElement.hasAttribute('data-type')) {
-        console.error('No valid draggable element found!');
-        e.preventDefault();
-        return;
-    }
+    // If we have a selected element, replace the clicked element
+    if (selectedElement) {
+        if (selectedElement.source === 'sidebar') {
+            // Placing from sidebar - replace existing element
+            if (inventory[selectedElement.type] <= 0) {
+                return;
+            }
 
-    const elementType = draggableElement.dataset.type;
+            const existingElement = shipData[key];
+            if (existingElement && existingElement !== selectedElement.type) {
+                // Return replaced element to inventory
+                inventory[existingElement]++;
+            }
 
-    if (draggableElement.classList.contains('sidebar-element')) {
+            // Only consume from inventory if it's a different element
+            if (existingElement !== selectedElement.type) {
+                inventory[selectedElement.type]--;
+            }
 
-        if (!elementType || inventory[elementType] <= 0) {
-            e.preventDefault();
+            shipData[key] = selectedElement.type;
+
+            updateGrid();
+            updateInventory();
+            saveShipData();
+            return;
+
+        } else if (selectedElement.source === 'grid') {
+            // Moving from grid - swap or move
+            const sourceKey = `${selectedElement.x},${selectedElement.y}`;
+            const sourceElement = selectedElement.type;
+            const targetElement = shipData[key];
+
+            if (sourceElement === targetElement) {
+                // Same element - just clear selection, no actual change needed
+                clearSelection();
+                return;
+            }
+
+            // Different elements - swap them
+            shipData[sourceKey] = targetElement;
+            shipData[key] = sourceElement;
+
+            clearSelection();
+            updateGrid();
+            updateInventory();
+            saveShipData();
             return;
         }
     }
 
-    // Make sure we have a valid element type
-    if (!elementType) {
-        console.error('No element type found!');
-        e.preventDefault();
-        return;
-    }
+    // No selected element - select this one
+    clearSelection();
 
-    e.dataTransfer.setData('text/plain', elementType);
-    e.dataTransfer.setData('source', draggableElement.classList.contains('sidebar-element') ? 'sidebar' : 'grid');
+    selectedElement = {
+        type: elementType,
+        source: 'grid',
+        x: x,
+        y: y
+    };
 
-    if (!draggableElement.classList.contains('sidebar-element')) {
-        // For grid elements, we need to find the grid cell parent
-        const gridCell = draggableElement.parentElement;
-        e.dataTransfer.setData('sourceX', gridCell.dataset.x);
-        e.dataTransfer.setData('sourceY', gridCell.dataset.y);
+    // Visual feedback
+    e.currentTarget.classList.add('selected');
+}
+
+function handleCellClick(e) {
+    const x = parseInt(e.currentTarget.dataset.x);
+    const y = parseInt(e.currentTarget.dataset.y);
+    const key = `${x},${y}`;
+
+    if (selectedElement) {
+        // Place selected element
+        if (selectedElement.source === 'sidebar') {
+            // Handle placing from sidebar
+            if (inventory[selectedElement.type] <= 0) {
+                return;
+            }
+
+            if (shipData[key]) {
+                // Swap with existing element
+                const existingElement = shipData[key];
+                inventory[existingElement]++;
+                inventory[selectedElement.type]--;
+                shipData[key] = selectedElement.type;
+            } else {
+                // Place in empty cell
+                inventory[selectedElement.type]--;
+                shipData[key] = selectedElement.type;
+            }
+
+            // Check if inventory is empty and auto-unselect
+            if (inventory[selectedElement.type] <= 0) {
+                clearSelection();
+            }
+
+            updateGrid();
+            updateInventory();
+            saveShipData();
+
+        } else if (selectedElement.source === 'grid') {
+            // Handle moving from grid
+            const sourceKey = `${selectedElement.x},${selectedElement.y}`;
+
+            if (shipData[key]) {
+                // Swap elements
+                const targetElement = shipData[key];
+                shipData[sourceKey] = targetElement;
+                shipData[key] = selectedElement.type;
+            } else {
+                // Move to empty cell
+                delete shipData[sourceKey];
+                shipData[key] = selectedElement.type;
+            }
+
+            // Clear selection after moving from grid
+            clearSelection();
+            updateGrid();
+            updateInventory();
+            saveShipData();
+        }
     }
 }
 
-function handleDragOver(e) {
-    e.preventDefault();
-    e.currentTarget.classList.add('drag-over');
-}
+function clearSelection() {
+    // Remove visual selection feedback
+    document.querySelectorAll('.selected').forEach(el => {
+        el.classList.remove('selected');
+    });
 
-function handleDragLeave(e) {
-    e.currentTarget.classList.remove('drag-over');
-}
-
-function handleDrop(e) {
-    e.preventDefault();
-    e.currentTarget.classList.remove('drag-over');
-
-    const elementType = e.dataTransfer.getData('text/plain');
-    const source = e.dataTransfer.getData('source');
-    const targetX = parseInt(e.currentTarget.dataset.x);
-    const targetY = parseInt(e.currentTarget.dataset.y);
-    const targetKey = `${targetX},${targetY}`;
-
-    // Handle swapping if target cell is occupied and source is from sidebar
-    if (shipData[targetKey] && source === 'sidebar') {
-        const existingElement = shipData[targetKey];
-        inventory[existingElement]++;
-        inventory[elementType]--;
-        shipData[targetKey] = elementType;
-
-        updateGrid();
-        updateInventory();
-        saveShipData();
-        return;
-    }
-
-    // Check if cell is already occupied (for grid-to-grid moves)
-    if (shipData[targetKey] && source === 'grid') {
-        return;
-    }
-
-    // Remove from source if moving from grid
-    if (source === 'grid') {
-        const sourceX = parseInt(e.dataTransfer.getData('sourceX'));
-        const sourceY = parseInt(e.dataTransfer.getData('sourceY'));
-        delete shipData[`${sourceX},${sourceY}`];
-    } else {
-        // Decrease inventory count
-        inventory[elementType]--;
-    }
-
-    // Add to target
-    shipData[targetKey] = elementType;
-
-    updateGrid();
-    updateInventory();
-    saveShipData();
+    selectedElement = null;
 }
 
 function createElement(type) {
     const element = document.createElement('div');
     element.className = `element ${type}`;
-    element.draggable = true;
     element.dataset.type = type;
 
     const comp = getComponent(type);
@@ -243,7 +277,14 @@ function createElement(type) {
         element.appendChild(img);
     }
 
-    element.addEventListener('dragstart', handleDragStart);
+    // Add click handler for grid elements
+    element.addEventListener('click', (e) => {
+        const cell = element.parentElement;
+        const x = parseInt(cell.dataset.x);
+        const y = parseInt(cell.dataset.y);
+        handleGridElementClick(e, type, x, y);
+    });
+
     return element;
 }
 
@@ -262,12 +303,10 @@ function updateInventory() {
         } else {
             countElement.style.display = 'none';
             sidebarElement.style.opacity = '0.5';
-            sidebarElement.draggable = false;
         }
 
         if (inventory[comp.name] > 0) {
             sidebarElement.style.opacity = '1';
-            sidebarElement.draggable = true;
         }
     });
 }
@@ -295,7 +334,6 @@ function updateGrid() {
 
 function saveShipData() {
     //console.log('Ship data:', shipData);
-
 }
 
 async function loadShipData() {
@@ -321,10 +359,8 @@ async function loadShipData() {
 
                     components.push(component);
                 });
-
             }
         });
-
     } else {
         console.error('Failed to load modules data or data is not an array');
         components = [];
@@ -345,8 +381,30 @@ async function loadShipData() {
 
 // Setup event listeners
 document.getElementById('mouse-tool').addEventListener('click', handleToolClick);
-document.getElementById('trash-tool').addEventListener('click', handleToolClick);
+document.getElementById('research-button').addEventListener('click', handleToolClick);
 document.getElementById('play-button').addEventListener('click', handlePlayClick);
+
+// Clear selection when clicking outside (only for grid selections)
+document.addEventListener('click', (e) => {
+    if (selectedElement && selectedElement.source === 'grid' &&
+        !e.target.closest('.sidebar-element') &&
+        !e.target.closest('.grid-cell') &&
+        !e.target.closest('.element')) {
+
+        // Remove selected grid element
+        const sourceKey = `${selectedElement.x},${selectedElement.y}`;
+        if (shipData[sourceKey]) {
+            const elementType = shipData[sourceKey];
+            inventory[elementType]++;
+            delete shipData[sourceKey];
+        }
+
+        clearSelection();
+        updateGrid();
+        updateInventory();
+        saveShipData();
+    }
+});
 
 // Initialize everything
 async function init() {
@@ -360,7 +418,7 @@ async function init() {
     window.Points = await loadResearchPoints();
     //console.log("Points: ", window.Points);
 
-    window.researchTree =  new Research()
+    window.researchTree = new Research()
 
     await initializeResearchOverlay();
 }
