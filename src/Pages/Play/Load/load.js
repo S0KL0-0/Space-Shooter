@@ -199,7 +199,7 @@ function applyResearchedUpgrades(moduleMap, upgradeMap) {
         if (item.researched && item.for && item.effect) {
             const targetModule = moduleMap.get(item.for);
             if (targetModule) {
-                console.log(`Applying upgrade ${id} to module ${item.for}`);
+                //console.log(`Applying upgrade ${id} to module ${item.for}`);
                 applyUpgradeEffect(targetModule, item.effect);
             } else {
                 console.warn(`Upgrade ${id} targets non-existent module ${item.for}`);
@@ -218,7 +218,7 @@ function applyResearchedEffects(moduleMap, research) {
                 if (item.researched && item.for && item.effect) {
                     const targetModule = moduleMap.get(item.for);
                     if (targetModule) {
-                        console.log(`Applying research ${item.id} to module ${item.for}`);
+                        //console.log(`Applying research ${item.id} to module ${item.for}`);
                         applyUpgradeEffect(targetModule, item.effect);
                     } else {
                         console.warn(`Research ${item.id} targets non-existent module ${item.for}`);

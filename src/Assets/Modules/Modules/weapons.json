@@ -11,7 +11,13 @@
     },
     "placement_rules": {
       "rotation": true
-    }
+    },
+    "barrel-end-coordinates": [
+      {
+        "x": 49,
+        "y": 15
+      }
+    ]
   },
   {
     "id": "weapon_plasma-cannon",
@@ -25,7 +31,13 @@
     },
     "placement_rules": {
       "rotation": true
-    }
+    },
+    "barrel-end-coordinates": [
+      {
+        "x": 49,
+        "y": 11
+      }
+    ]
   },
   {
     "id": "weapon_scorpion",
@@ -39,7 +51,17 @@
     },
     "placement_rules": {
       "rotation": true
-    }
+    },
+    "barrel-end-coordinates": [
+      {
+        "x": 30,
+        "y": 22
+      },
+      {
+        "x": 68,
+        "y": 22
+      }
+    ]
   },
   {
     "id": "weapon_flak-cannon",
@@ -53,6 +75,12 @@
     },
     "placement_rules": {
       "rotation": true
-    }
+    },
+    "barrel-end-coordinates": [
+      {
+        "x": 50,
+        "y": 2
+      }
+    ]
   }
 ]

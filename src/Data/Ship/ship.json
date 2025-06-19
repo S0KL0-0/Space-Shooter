@@ -29,7 +29,10 @@
       "id": "weapon_blaster",
       "rotation": "NONE"
     },
-    null,
+    {
+      "id": "weapon_plasma-cannon",
+      "rotation": "UP"
+    },
     {
       "id": "weapon_blaster",
       "rotation": "NONE"
@@ -41,7 +44,10 @@
   [
     null,
     null,
-    null,
+    {
+      "id": "weapon_blaster",
+      "rotation": "LEFT"
+    },
     {
       "id": "armor_basic",
       "rotation": "NONE"
@@ -54,7 +60,10 @@
       "id": "armor_basic",
       "rotation": "NONE"
     },
-    null,
+    {
+      "id": "weapon_blaster",
+      "rotation": "RIGHT"
+    },
     null,
     null
   ],

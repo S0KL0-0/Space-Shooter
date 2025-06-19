@@ -6,6 +6,9 @@ let components;
 
 let inventory = {};
 
+// Rotation states
+const ROTATIONS = ['UP', 'RIGHT', 'DOWN', 'LEFT'];
+
 // Initialize inventory from components
 function initInventory() {
     components.forEach(comp => {
@@ -17,6 +20,24 @@ function initInventory() {
 
 function getComponent(name) {
     return components.find(comp => comp.name === name);
+}
+
+// Get next rotation in clockwise order
+function getNextRotation(currentRotation) {
+    const currentIndex = ROTATIONS.indexOf(currentRotation);
+    const nextIndex = (currentIndex + 1) % ROTATIONS.length;
+    return ROTATIONS[nextIndex];
+}
+
+// Get rotation angle in degrees
+function getRotationAngle(rotation) {
+    const rotationAngles = {
+        'UP': 0,
+        'RIGHT': 90,
+        'DOWN': 180,
+        'LEFT': 270
+    };
+    return rotationAngles[rotation] || 0;
 }
 
 // Create sidebar components dynamically
@@ -123,26 +144,45 @@ function handleGridElementClick(e, elementType, x, y) {
 
     const key = `${x},${y}`;
 
-    // If we have a selected element, replace the clicked element
+    // If we have a selected element, handle placement/rotation
     if (selectedElement) {
         if (selectedElement.source === 'sidebar') {
+            // Check if clicking on same type - rotate instead of replace
+            if (shipData[key] && shipData[key].id === selectedElement.type) {
+                // Rotate the existing component
+                const currentRotation = shipData[key].rotation || 'UP';
+                const nextRotation = getNextRotation(currentRotation);
+
+                shipData[key] = {
+                    id: selectedElement.type,
+                    rotation: nextRotation
+                };
+
+                updateGrid();
+                saveShipData();
+                return;
+            }
+
             // Placing from sidebar - replace existing element
             if (inventory[selectedElement.type] <= 0) {
                 return;
             }
 
             const existingElement = shipData[key];
-            if (existingElement && existingElement !== selectedElement.type) {
+            if (existingElement && existingElement.id !== selectedElement.type) {
                 // Return replaced element to inventory
-                inventory[existingElement]++;
+                inventory[existingElement.id]++;
             }
 
             // Only consume from inventory if it's a different element
-            if (existingElement !== selectedElement.type) {
+            if (!existingElement || existingElement.id !== selectedElement.type) {
                 inventory[selectedElement.type]--;
             }
 
-            shipData[key] = selectedElement.type;
+            shipData[key] = {
+                id: selectedElement.type,
+                rotation: 'UP' // Default rotation when placing new
+            };
 
             updateGrid();
             updateInventory();
@@ -150,14 +190,39 @@ function handleGridElementClick(e, elementType, x, y) {
             return;
 
         } else if (selectedElement.source === 'grid') {
+            // Check if clicking on same element - rotate it
+            if (selectedElement.x === x && selectedElement.y === y) {
+                const currentRotation = shipData[key].rotation || 'UP';
+                const nextRotation = getNextRotation(currentRotation);
+
+                shipData[key] = {
+                    id: selectedElement.type,
+                    rotation: nextRotation
+                };
+
+                updateGrid();
+                saveShipData();
+                return;
+            }
+
             // Moving from grid - swap or move
             const sourceKey = `${selectedElement.x},${selectedElement.y}`;
-            const sourceElement = selectedElement.type;
+            const sourceElement = shipData[sourceKey];
             const targetElement = shipData[key];
 
-            if (sourceElement === targetElement) {
-                // Same element - just clear selection, no actual change needed
+            if (sourceElement && sourceElement.id === targetElement?.id) {
+                // Same element type - rotate target instead of swapping
+                const currentRotation = targetElement.rotation || 'UP';
+                const nextRotation = getNextRotation(currentRotation);
+
+                shipData[key] = {
+                    id: targetElement.id,
+                    rotation: nextRotation
+                };
+
                 clearSelection();
+                updateGrid();
+                saveShipData();
                 return;
             }
 
@@ -203,13 +268,19 @@ function handleCellClick(e) {
             if (shipData[key]) {
                 // Swap with existing element
                 const existingElement = shipData[key];
-                inventory[existingElement]++;
+                inventory[existingElement.id]++;
                 inventory[selectedElement.type]--;
-                shipData[key] = selectedElement.type;
+                shipData[key] = {
+                    id: selectedElement.type,
+                    rotation: 'UP'
+                };
             } else {
                 // Place in empty cell
                 inventory[selectedElement.type]--;
-                shipData[key] = selectedElement.type;
+                shipData[key] = {
+                    id: selectedElement.type,
+                    rotation: 'UP'
+                };
             }
 
             // Check if inventory is empty and auto-unselect
@@ -228,12 +299,14 @@ function handleCellClick(e) {
             if (shipData[key]) {
                 // Swap elements
                 const targetElement = shipData[key];
+                const sourceElement = shipData[sourceKey];
                 shipData[sourceKey] = targetElement;
-                shipData[key] = selectedElement.type;
+                shipData[key] = sourceElement;
             } else {
                 // Move to empty cell
+                const sourceElement = shipData[sourceKey];
                 delete shipData[sourceKey];
-                shipData[key] = selectedElement.type;
+                shipData[key] = sourceElement;
             }
 
             // Clear selection after moving from grid
@@ -254,7 +327,7 @@ function clearSelection() {
     selectedElement = null;
 }
 
-function createElement(type) {
+function createElement(type, rotation = 'UP') {
     const element = document.createElement('div');
     element.className = `element ${type}`;
     element.dataset.type = type;
@@ -267,6 +340,10 @@ function createElement(type) {
         img.style.width = '100%';
         img.style.height = '100%';
         img.style.objectFit = 'contain';
+
+        // Apply rotation
+        const rotationAngle = getRotationAngle(rotation);
+        img.style.transform = `rotate(${rotationAngle}deg)`;
 
         // Add error handling for grid images too
         img.onerror = function() {
@@ -325,7 +402,11 @@ function updateGrid() {
 
         // Add element if exists
         if (shipData[key]) {
-            const element = createElement(shipData[key]);
+            const componentData = shipData[key];
+            const componentType = typeof componentData === 'string' ? componentData : componentData.id;
+            const rotation = typeof componentData === 'object' ? componentData.rotation : 'UP';
+
+            const element = createElement(componentType, rotation);
             cell.appendChild(element);
             cell.classList.add('occupied');
         }
@@ -347,13 +428,22 @@ function saveShipData() {
     // Fill the 2D array with ship data
     Object.keys(shipData).forEach(key => {
         const [x, y] = key.split(',').map(Number);
-        const componentType = shipData[key];
+        const componentData = shipData[key];
 
-        // Create component object with id and rotation
-        shipGrid[y][x] = {
-            id: componentType,
-            rotation: "NONE" // Currently no rotation system implemented
-        };
+        if (componentData) {
+            // Handle both old format (string) and new format (object)
+            if (typeof componentData === 'string') {
+                shipGrid[y][x] = {
+                    id: componentData,
+                    rotation: 'UP' // Default for old data
+                };
+            } else {
+                shipGrid[y][x] = {
+                    id: componentData.id,
+                    rotation: componentData.rotation || 'UP'
+                };
+            }
+        }
     });
 
     // Save to file using the Electron API
@@ -363,7 +453,7 @@ function saveShipData() {
     if (window.electronAPI && window.electronAPI.saveJSON) {
         window.electronAPI.saveJSON(filePath, shipGrid)
             .then(() => {
-                console.log('Ship data saved successfully to:', filePath);
+                //console.log('Ship data saved successfully to:', filePath);
             })
             .catch(error => {
                 console.error('Failed to save ship data:', error);
@@ -373,13 +463,13 @@ function saveShipData() {
     }
 
     // Also log the ship data for debugging
-    console.log('Ship grid:', shipGrid);
+    //console.log('Ship grid:', shipGrid);
 }
 
 async function loadShipData() {
     // Load all data using the new load function
     const allData = await load();
-    console.log("All Data: ", allData);
+    //console.log("All Data: ", allData);
 
     // Convert modules Map to components array for compatibility
     if (allData && allData.modules && allData.modules instanceof Map) {
@@ -404,6 +494,8 @@ async function loadShipData() {
 
     // Store all data globally for other components
     window.allGameData = allData;
+
+    window.electronAPI.setGlobal('AllData', allData);
 }
 
 // Setup event listeners
@@ -426,7 +518,8 @@ document.addEventListener('click', (e) => {
         // Remove selected grid element
         const sourceKey = `${selectedElement.x},${selectedElement.y}`;
         if (shipData[sourceKey]) {
-            const elementType = shipData[sourceKey];
+            const componentData = shipData[sourceKey];
+            const elementType = typeof componentData === 'string' ? componentData : componentData.id;
             inventory[elementType]++;
             delete shipData[sourceKey];
         }
@@ -442,7 +535,7 @@ document.addEventListener('click', (e) => {
 async function loadExistingShipData() {
     try {
         const shipGrid = await loadFile('Data/Ship/ship.json');
-        console.log('Loaded ship grid:', shipGrid);
+        //console.log('Loaded ship grid:', shipGrid);
 
         if (shipGrid && Array.isArray(shipGrid)) {
             // Convert 2D array back to shipData object format
@@ -453,12 +546,15 @@ async function loadExistingShipData() {
                     const cell = shipGrid[y][x];
                     if (cell && cell.id) {
                         const key = `${x},${y}`;
-                        shipData[key] = cell.id;
+                        shipData[key] = {
+                            id: cell.id,
+                            rotation: cell.rotation || 'UP' // Default to UP if no rotation specified
+                        };
                     }
                 }
             }
 
-            console.log('Converted shipData:', shipData);
+            //console.log('Converted shipData:', shipData);
             return true;
         }
     } catch (error) {
@@ -473,7 +569,8 @@ function updateInventoryFromPlacedComponents() {
     // Count how many of each component are placed on the grid
     const placedComponents = {};
 
-    Object.values(shipData).forEach(componentType => {
+    Object.values(shipData).forEach(componentData => {
+        const componentType = typeof componentData === 'string' ? componentData : componentData.id;
         placedComponents[componentType] = (placedComponents[componentType] || 0) + 1;
     });
 

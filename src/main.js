@@ -16,6 +16,16 @@ function createWindow() {
     win.loadFile('src/index.html');
 }
 
+let sharedData = {} // GlobalData, persists across html pages
+
+ipcMain.handle('set-global', (event, key, value) => {
+    sharedData[key] = value
+})
+
+ipcMain.handle('get-global', (event, key) => {
+    return sharedData[key]
+})
+
 // Handle JSON loading
 ipcMain.handle('load-json', async (event, filePath) => {
     try {

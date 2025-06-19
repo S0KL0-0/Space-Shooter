@@ -11,6 +11,59 @@ const SHIP_RENDER_CONFIG = {
     gridLineWidth: 1        // Grid line width
 };
 
+// Get rotation angle in degrees for rendering
+function getRotationAngle(rotation) {
+    const rotationAngles = {
+        'UP': 0,
+        'RIGHT': 90,
+        'DOWN': 180,
+        'LEFT': 270
+    };
+    return rotationAngles[rotation] || 0;
+}
+
+// Load and rotate image
+function loadAndRotateImage(imageSrc, rotation) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            const angle = getRotationAngle(rotation);
+
+            if (angle === 0) {
+                // No rotation needed
+                resolve(img);
+                return;
+            }
+
+            // Create a canvas to rotate the image
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // For 90 and 270 degree rotations, swap width and height
+            if (angle === 90 || angle === 270) {
+                canvas.width = img.height;
+                canvas.height = img.width;
+            } else {
+                canvas.width = img.width;
+                canvas.height = img.height;
+            }
+
+            // Move to center, rotate, then move back
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate((angle * Math.PI) / 180);
+            ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+            // Create a new image from the rotated canvas
+            const rotatedImg = new Image();
+            rotatedImg.onload = () => resolve(rotatedImg);
+            rotatedImg.onerror = reject;
+            rotatedImg.src = canvas.toDataURL();
+        };
+        img.onerror = reject;
+        img.src = imageSrc;
+    });
+}
+
 async function constructShip() {
     try {
         // Calculate actual dimensions
@@ -55,27 +108,30 @@ async function constructShip() {
             }
         }
 
-        // Load and draw all component images
+        // Load and draw all component images with rotation
         const imagePromises = [];
 
         Object.keys(shipData).forEach(key => {
             const [x, y] = key.split(',').map(Number);
-            const componentType = shipData[key];
+            const componentData = shipData[key];
+
+            // Handle both old format (string) and new format (object)
+            const componentType = typeof componentData === 'string' ? componentData : componentData.id;
+            const rotation = typeof componentData === 'object' ? componentData.rotation : 'UP';
+
             const component = getComponent(componentType);
 
             if (component && component.image) {
-                const imagePromise = new Promise((resolve, reject) => {
-                    const img = new Image();
-                    img.onload = () => {
+                const imagePromise = loadAndRotateImage(component.image, rotation)
+                    .then(rotatedImg => {
                         const drawX = actualPadding + (x * actualCellSize);
                         const drawY = actualPadding + (y * actualCellSize);
 
-                        // Draw the image
-                        ctx.drawImage(img, drawX, drawY, actualCellSize, actualCellSize);
-                        resolve();
-                    };
-                    img.onerror = () => {
-                        console.warn(`Failed to load image for component: ${componentType}`);
+                        // Draw the rotated image
+                        ctx.drawImage(rotatedImg, drawX, drawY, actualCellSize, actualCellSize);
+                    })
+                    .catch(error => {
+                        console.warn(`Failed to load/rotate image for component: ${componentType}`, error);
 
                         // Draw a fallback rectangle with text
                         const drawX = actualPadding + (x * actualCellSize);
@@ -94,16 +150,21 @@ async function constructShip() {
                             drawY + actualCellSize / 2
                         );
 
-                        resolve();
-                    };
-                    img.src = component.image;
-                });
+                        // Add rotation indicator
+                        ctx.fillStyle = '#ffff00';
+                        ctx.font = `${Math.floor(actualCellSize * 0.15)}px Arial`;
+                        ctx.fillText(
+                            rotation,
+                            drawX + actualCellSize / 2,
+                            drawY + actualCellSize * 0.8
+                        );
+                    });
 
                 imagePromises.push(imagePromise);
             }
         });
 
-        // Wait for all images to load
+        // Wait for all images to load and be drawn
         await Promise.all(imagePromises);
 
         // Convert canvas to data URL
@@ -117,13 +178,11 @@ async function constructShip() {
 
         if (window.electronAPI && window.electronAPI.savePNG) {
             await window.electronAPI.savePNG(filePath, base64Data);
-            console.log('Ship image saved successfully to:', filePath);
+            //console.log('Ship image saved successfully to:', filePath);
         } else {
             console.error('electronAPI.savePNG function not available');
             throw new Error('savePNG function not available');
         }
-
-        console.log('Ship image constructed and downloaded successfully');
 
         return canvas; // Return canvas in case you want to use it elsewhere
 
