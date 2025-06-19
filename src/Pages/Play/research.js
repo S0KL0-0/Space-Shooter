@@ -131,8 +131,15 @@ class Research {
     }
 
     formatNodeName(id) {
-        return name = window.moduleMap.get(id).name;
+        let name;
+        if (id.startsWith("upgrade")) {
+            name = window.upgradeMap.get(id)?.name;
+        } else {
+            name = window.moduleMap.get(id)?.name;
+        }
+        return name ?? id; // Fallback to id if name is not found
     }
+
 
     addTabButtons() {
         const tabButtonsContainer = document.querySelector('.research-tabs-header .tab-buttons');
@@ -534,9 +541,32 @@ class Research {
     }
 }
 
+// Updated to use existing loaded data instead of loading new data
+function loadResearch() {
+    // Use the research data that was already loaded and stored in window.allGameData
+    if (window.allGameData && window.allGameData.research) {
+        return window.allGameData.research;
+    } else {
+        console.error('Research data not found in window.allGameData');
+        return [];
+    }
+}
+
+// Updated to use existing loaded data
+async function loadResearchPoints() {
+    try {
+        // Load points from the JSON file
+        const data = await window.electronAPI.loadJSON('Data/other.json');
+        return data && typeof data.Points === 'number' ? data.Points : 0;
+    } catch (error) {
+        console.error('Failed to load research points:', error);
+        return 0;
+    }
+}
+
 async function initializeResearchOverlay() {
-    researchData = await loadResearch();
-    console.log(researchData);
+    researchData = loadResearch(); // Now uses existing loaded data
+    //console.log("research data: ", researchData);
 
     //console.log('Loaded Research: ', researchData);
     //console.log('Module Map Loaded: ', window.moduleMap);

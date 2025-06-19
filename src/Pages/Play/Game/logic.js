@@ -46,7 +46,20 @@ countdownText.visible = false;
 app.stage.addChild(countdownText);
 
 // Click to start
-app.view.addEventListener('click', startCountdown);
+document.addEventListener('DOMContentLoaded', async () => {
+    // Wait for data to load
+    const allData = await window.electronAPI.getGlobal('AllData');
+    console.log(allData);
+
+    // Now allow click to start
+    app.view.addEventListener('click', startCountdown);
+});
+
+
+async function loadData() {
+    const allData = await window.electronAPI.getGlobal('AllData')
+    console.log(allData)
+}
 
 function startCountdown() {
     if (gameState !== 'waiting') return;

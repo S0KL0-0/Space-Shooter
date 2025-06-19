@@ -1,0 +1,26 @@
+[
+  {
+    "name": "WeaponUpgrades",
+    "path": "Upgrades/weapons.json"
+  },
+  {
+    "name": "HullUpgrades",
+    "path": "Upgrades/hulls.json"
+  },
+  {
+    "name": "ArmorUpgrades",
+    "path": "Upgrades/armors.json"
+  },
+  {
+    "name": "ShieldUpgrades",
+    "path": "Upgrades/shields.json"
+  },
+  {
+    "name": "ReactorUpgrades",
+    "path": "Upgrades/reactors.json"
+  },
+  {
+    "name": "EngineUpgrades",
+    "path": "Upgrades/engines.json"
+  }
+]

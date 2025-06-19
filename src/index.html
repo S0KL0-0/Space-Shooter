@@ -8,7 +8,6 @@
 <body>
 <div class="menu-container">
     <button class="menu-button" onclick="navigateTo('play')">Play</button>
-    <button class="menu-button" onclick="navigateTo('settings')">Settings</button>
     <button class="menu-button quit-button" onclick="quitApp()">Quit</button>
 </div>
 
@@ -18,9 +17,6 @@
         switch(page) {
             case 'play':
                 window.location.href = 'Pages/Play/ship.html';
-                break;
-            case 'settings':
-                window.location.href = 'Pages/Settings/settings.html';
                 break;
         }
     }

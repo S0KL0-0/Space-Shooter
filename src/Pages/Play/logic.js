@@ -1,10 +1,13 @@
 const gridSize = 9;
 let shipData = {};
-let currentTool = 'mouse';
+let selectedElement = null; // Track selected element
 
 let components;
 
 let inventory = {};
+
+// Rotation states
+const ROTATIONS = ['UP', 'RIGHT', 'DOWN', 'LEFT'];
 
 // Initialize inventory from components
 function initInventory() {
@@ -17,6 +20,24 @@ function initInventory() {
 
 function getComponent(name) {
     return components.find(comp => comp.name === name);
+}
+
+// Get next rotation in clockwise order
+function getNextRotation(currentRotation) {
+    const currentIndex = ROTATIONS.indexOf(currentRotation);
+    const nextIndex = (currentIndex + 1) % ROTATIONS.length;
+    return ROTATIONS[nextIndex];
+}
+
+// Get rotation angle in degrees
+function getRotationAngle(rotation) {
+    const rotationAngles = {
+        'UP': 0,
+        'RIGHT': 90,
+        'DOWN': 180,
+        'LEFT': 270
+    };
+    return rotationAngles[rotation] || 0;
 }
 
 // Create sidebar components dynamically
@@ -33,7 +54,6 @@ function createSidebarComponents() {
 
         const element = document.createElement('div');
         element.className = `element sidebar-element ${comp.name}`;
-        element.draggable = true;
         element.dataset.type = comp.name;
 
         const img = document.createElement('img');
@@ -51,7 +71,7 @@ function createSidebarComponents() {
         };
 
         element.appendChild(img);
-        element.addEventListener('dragstart', handleDragStart);
+        element.addEventListener('click', handleSidebarElementClick);
 
         const countElement = document.createElement('div');
         countElement.className = 'element-count';
@@ -79,9 +99,6 @@ function createGrid() {
             cell.dataset.x = x;
             cell.dataset.y = y;
 
-            cell.addEventListener('dragover', handleDragOver);
-            cell.addEventListener('drop', handleDrop);
-            cell.addEventListener('dragleave', handleDragLeave);
             cell.addEventListener('click', handleCellClick);
 
             grid.appendChild(cell);
@@ -89,140 +106,230 @@ function createGrid() {
     }
 }
 
-// Tool handlers
-function handleToolClick(e) {
-    document.querySelectorAll('.tool-icon').forEach(icon => icon.classList.remove('active'));
-    e.currentTarget.classList.add('active');
-    currentTool = e.currentTarget.id === 'mouse-tool' ? 'mouse' : 'trash';
-}
-
 function handlePlayClick() {
-    window.location.href = './Game/game.html';
+    constructShip().then(r => window.location.href = './Game/game.html');
 }
 
-function handleCellClick(e) {
-    if (currentTool !== 'trash') return;
+function handleSidebarElementClick(e) {
+    const elementType = e.currentTarget.dataset.type;
 
-    const x = parseInt(e.currentTarget.dataset.x);
-    const y = parseInt(e.currentTarget.dataset.y);
+    if (!elementType || inventory[elementType] <= 0) {
+        return;
+    }
+
+    // Check if this element is already selected
+    if (selectedElement &&
+        selectedElement.type === elementType &&
+        selectedElement.source === 'sidebar') {
+        // If already selected, unselect it
+        clearSelection();
+        return;
+    }
+
+    // Clear previous selection
+    clearSelection();
+
+    // Select this element from sidebar
+    selectedElement = {
+        type: elementType,
+        source: 'sidebar'
+    };
+
+    // Visual feedback
+    e.currentTarget.classList.add('selected');
+}
+
+function handleGridElementClick(e, elementType, x, y) {
+    e.stopPropagation();
+
     const key = `${x},${y}`;
 
-    if (shipData[key]) {
-        const elementType = shipData[key];
-        inventory[elementType]++;
-        delete shipData[key];
-        updateGrid();
-        updateInventory();
-        saveShipData();
-    }
-}
+    // If we have a selected element, handle placement/rotation
+    if (selectedElement) {
+        if (selectedElement.source === 'sidebar') {
+            // Check if clicking on same type - rotate instead of replace
+            if (shipData[key] && shipData[key].id === selectedElement.type) {
+                // Rotate the existing component
+                const currentRotation = shipData[key].rotation || 'UP';
+                const nextRotation = getNextRotation(currentRotation);
 
-// Drag handlers
-function handleDragStart(e) {
-    if (currentTool !== 'mouse') {
-        e.preventDefault();
-        return;
-    }
+                shipData[key] = {
+                    id: selectedElement.type,
+                    rotation: nextRotation
+                };
 
-    // Find the actual draggable element (might be parent if dragging from image)
-    let draggableElement = e.target;
-    if (!draggableElement.hasAttribute('data-type')) {
-        draggableElement = draggableElement.closest('[data-type]');
-    }
+                updateGrid();
+                saveShipData();
+                return;
+            }
 
-    if (!draggableElement || !draggableElement.hasAttribute('data-type')) {
-        console.error('No valid draggable element found!');
-        e.preventDefault();
-        return;
-    }
+            // Placing from sidebar - replace existing element
+            if (inventory[selectedElement.type] <= 0) {
+                return;
+            }
 
-    const elementType = draggableElement.dataset.type;
+            const existingElement = shipData[key];
+            if (existingElement && existingElement.id !== selectedElement.type) {
+                // Return replaced element to inventory
+                inventory[existingElement.id]++;
+            }
 
-    if (draggableElement.classList.contains('sidebar-element')) {
+            // Only consume from inventory if it's a different element
+            if (!existingElement || existingElement.id !== selectedElement.type) {
+                inventory[selectedElement.type]--;
+            }
 
-        if (!elementType || inventory[elementType] <= 0) {
-            e.preventDefault();
+            shipData[key] = {
+                id: selectedElement.type,
+                rotation: 'UP' // Default rotation when placing new
+            };
+
+            updateGrid();
+            updateInventory();
+            saveShipData();
+            return;
+
+        } else if (selectedElement.source === 'grid') {
+            // Check if clicking on same element - rotate it
+            if (selectedElement.x === x && selectedElement.y === y) {
+                const currentRotation = shipData[key].rotation || 'UP';
+                const nextRotation = getNextRotation(currentRotation);
+
+                shipData[key] = {
+                    id: selectedElement.type,
+                    rotation: nextRotation
+                };
+
+                updateGrid();
+                saveShipData();
+                return;
+            }
+
+            // Moving from grid - swap or move
+            const sourceKey = `${selectedElement.x},${selectedElement.y}`;
+            const sourceElement = shipData[sourceKey];
+            const targetElement = shipData[key];
+
+            if (sourceElement && sourceElement.id === targetElement?.id) {
+                // Same element type - rotate target instead of swapping
+                const currentRotation = targetElement.rotation || 'UP';
+                const nextRotation = getNextRotation(currentRotation);
+
+                shipData[key] = {
+                    id: targetElement.id,
+                    rotation: nextRotation
+                };
+
+                clearSelection();
+                updateGrid();
+                saveShipData();
+                return;
+            }
+
+            // Different elements - swap them
+            shipData[sourceKey] = targetElement;
+            shipData[key] = sourceElement;
+
+            clearSelection();
+            updateGrid();
+            updateInventory();
+            saveShipData();
             return;
         }
     }
 
-    // Make sure we have a valid element type
-    if (!elementType) {
-        console.error('No element type found!');
-        e.preventDefault();
-        return;
-    }
+    // No selected element - select this one
+    clearSelection();
 
-    e.dataTransfer.setData('text/plain', elementType);
-    e.dataTransfer.setData('source', draggableElement.classList.contains('sidebar-element') ? 'sidebar' : 'grid');
+    selectedElement = {
+        type: elementType,
+        source: 'grid',
+        x: x,
+        y: y
+    };
 
-    if (!draggableElement.classList.contains('sidebar-element')) {
-        // For grid elements, we need to find the grid cell parent
-        const gridCell = draggableElement.parentElement;
-        e.dataTransfer.setData('sourceX', gridCell.dataset.x);
-        e.dataTransfer.setData('sourceY', gridCell.dataset.y);
+    // Visual feedback
+    e.currentTarget.classList.add('selected');
+}
+
+function handleCellClick(e) {
+    const x = parseInt(e.currentTarget.dataset.x);
+    const y = parseInt(e.currentTarget.dataset.y);
+    const key = `${x},${y}`;
+
+    if (selectedElement) {
+        // Place selected element
+        if (selectedElement.source === 'sidebar') {
+            // Handle placing from sidebar
+            if (inventory[selectedElement.type] <= 0) {
+                return;
+            }
+
+            if (shipData[key]) {
+                // Swap with existing element
+                const existingElement = shipData[key];
+                inventory[existingElement.id]++;
+                inventory[selectedElement.type]--;
+                shipData[key] = {
+                    id: selectedElement.type,
+                    rotation: 'UP'
+                };
+            } else {
+                // Place in empty cell
+                inventory[selectedElement.type]--;
+                shipData[key] = {
+                    id: selectedElement.type,
+                    rotation: 'UP'
+                };
+            }
+
+            // Check if inventory is empty and auto-unselect
+            if (inventory[selectedElement.type] <= 0) {
+                clearSelection();
+            }
+
+            updateGrid();
+            updateInventory();
+            saveShipData();
+
+        } else if (selectedElement.source === 'grid') {
+            // Handle moving from grid
+            const sourceKey = `${selectedElement.x},${selectedElement.y}`;
+
+            if (shipData[key]) {
+                // Swap elements
+                const targetElement = shipData[key];
+                const sourceElement = shipData[sourceKey];
+                shipData[sourceKey] = targetElement;
+                shipData[key] = sourceElement;
+            } else {
+                // Move to empty cell
+                const sourceElement = shipData[sourceKey];
+                delete shipData[sourceKey];
+                shipData[key] = sourceElement;
+            }
+
+            // Clear selection after moving from grid
+            clearSelection();
+            updateGrid();
+            updateInventory();
+            saveShipData();
+        }
     }
 }
 
-function handleDragOver(e) {
-    e.preventDefault();
-    e.currentTarget.classList.add('drag-over');
+function clearSelection() {
+    // Remove visual selection feedback
+    document.querySelectorAll('.selected').forEach(el => {
+        el.classList.remove('selected');
+    });
+
+    selectedElement = null;
 }
 
-function handleDragLeave(e) {
-    e.currentTarget.classList.remove('drag-over');
-}
-
-function handleDrop(e) {
-    e.preventDefault();
-    e.currentTarget.classList.remove('drag-over');
-
-    const elementType = e.dataTransfer.getData('text/plain');
-    const source = e.dataTransfer.getData('source');
-    const targetX = parseInt(e.currentTarget.dataset.x);
-    const targetY = parseInt(e.currentTarget.dataset.y);
-    const targetKey = `${targetX},${targetY}`;
-
-    // Handle swapping if target cell is occupied and source is from sidebar
-    if (shipData[targetKey] && source === 'sidebar') {
-        const existingElement = shipData[targetKey];
-        inventory[existingElement]++;
-        inventory[elementType]--;
-        shipData[targetKey] = elementType;
-
-        updateGrid();
-        updateInventory();
-        saveShipData();
-        return;
-    }
-
-    // Check if cell is already occupied (for grid-to-grid moves)
-    if (shipData[targetKey] && source === 'grid') {
-        return;
-    }
-
-    // Remove from source if moving from grid
-    if (source === 'grid') {
-        const sourceX = parseInt(e.dataTransfer.getData('sourceX'));
-        const sourceY = parseInt(e.dataTransfer.getData('sourceY'));
-        delete shipData[`${sourceX},${sourceY}`];
-    } else {
-        // Decrease inventory count
-        inventory[elementType]--;
-    }
-
-    // Add to target
-    shipData[targetKey] = elementType;
-
-    updateGrid();
-    updateInventory();
-    saveShipData();
-}
-
-function createElement(type) {
+function createElement(type, rotation = 'UP') {
     const element = document.createElement('div');
     element.className = `element ${type}`;
-    element.draggable = true;
     element.dataset.type = type;
 
     const comp = getComponent(type);
@@ -234,6 +341,10 @@ function createElement(type) {
         img.style.height = '100%';
         img.style.objectFit = 'contain';
 
+        // Apply rotation
+        const rotationAngle = getRotationAngle(rotation);
+        img.style.transform = `rotate(${rotationAngle}deg)`;
+
         // Add error handling for grid images too
         img.onerror = function() {
             console.warn(`Failed to load grid image: ${comp.image}`);
@@ -243,7 +354,14 @@ function createElement(type) {
         element.appendChild(img);
     }
 
-    element.addEventListener('dragstart', handleDragStart);
+    // Add click handler for grid elements
+    element.addEventListener('click', (e) => {
+        const cell = element.parentElement;
+        const x = parseInt(cell.dataset.x);
+        const y = parseInt(cell.dataset.y);
+        handleGridElementClick(e, type, x, y);
+    });
+
     return element;
 }
 
@@ -262,12 +380,10 @@ function updateInventory() {
         } else {
             countElement.style.display = 'none';
             sidebarElement.style.opacity = '0.5';
-            sidebarElement.draggable = false;
         }
 
         if (inventory[comp.name] > 0) {
             sidebarElement.style.opacity = '1';
-            sidebarElement.draggable = true;
         }
     });
 }
@@ -286,7 +402,11 @@ function updateGrid() {
 
         // Add element if exists
         if (shipData[key]) {
-            const element = createElement(shipData[key]);
+            const componentData = shipData[key];
+            const componentType = typeof componentData === 'string' ? componentData : componentData.id;
+            const rotation = typeof componentData === 'object' ? componentData.rotation : 'UP';
+
+            const element = createElement(componentType, rotation);
             cell.appendChild(element);
             cell.classList.add('occupied');
         }
@@ -294,64 +414,186 @@ function updateGrid() {
 }
 
 function saveShipData() {
-    //console.log('Ship data:', shipData);
+    // Create a 2D array representing the grid
+    const shipGrid = [];
 
+    // Initialize the 2D array with null values
+    for (let y = 0; y < gridSize; y++) {
+        shipGrid[y] = [];
+        for (let x = 0; x < gridSize; x++) {
+            shipGrid[y][x] = null;
+        }
+    }
+
+    // Fill the 2D array with ship data
+    Object.keys(shipData).forEach(key => {
+        const [x, y] = key.split(',').map(Number);
+        const componentData = shipData[key];
+
+        if (componentData) {
+            // Handle both old format (string) and new format (object)
+            if (typeof componentData === 'string') {
+                shipGrid[y][x] = {
+                    id: componentData,
+                    rotation: 'UP' // Default for old data
+                };
+            } else {
+                shipGrid[y][x] = {
+                    id: componentData.id,
+                    rotation: componentData.rotation || 'UP'
+                };
+            }
+        }
+    });
+
+    // Save to file using the Electron API
+    const filePath = 'Data/Ship/ship.json';
+
+    // Use the saveJSON function from the Electron API
+    if (window.electronAPI && window.electronAPI.saveJSON) {
+        window.electronAPI.saveJSON(filePath, shipGrid)
+            .then(() => {
+                //console.log('Ship data saved successfully to:', filePath);
+            })
+            .catch(error => {
+                console.error('Failed to save ship data:', error);
+            });
+    } else {
+        console.error('electronAPI.saveJSON function not available');
+    }
+
+    // Also log the ship data for debugging
+    //console.log('Ship grid:', shipGrid);
 }
 
 async function loadShipData() {
-    const moduleData = await loadModules();
-    //console.log('Module Data: ', moduleData);
+    // Load all data using the new load function
+    const allData = await load();
+    //console.log("All Data: ", allData);
 
-    // Flatten all module data into a single components array
-    if (moduleData && Array.isArray(moduleData)) {
+    // Convert modules Map to components array for compatibility
+    if (allData && allData.modules && allData.modules instanceof Map) {
         components = [];
-        moduleData.forEach(module => {
-            if (module.data && Array.isArray(module.data)) {
-                // Transform each component to match expected format
-                module.data.forEach(item => {
-                    const component = {
-                        name: item.id,
-                        displayName: item.name,
-                        maxValue: item.placement_rules.maxValue
-                    };
-
-                    if (item.image) {
-                        component.image = item.image;
-                    }
-
-                    components.push(component);
-                });
-
-            }
+        allData.modules.forEach((moduleData, moduleId) => {
+            const component = {
+                name: moduleId,
+                displayName: moduleData.name,
+                maxValue: moduleData.placement_rules?.amount || 0,
+                image: moduleData.image
+            };
+            components.push(component);
         });
-
     } else {
-        console.error('Failed to load modules data or data is not an array');
+        console.error('Failed to load modules data or data is not a Map');
         components = [];
     }
 
-    //window.moduleData = moduleData;
+    // Store the module map for other parts of the application
+    window.moduleMap = allData.modules;
+    window.upgradeMap = allData.upgrades
 
-    const moduleMap = new Map();
+    // Store all data globally for other components
+    window.allGameData = allData;
 
-    moduleData.forEach(category => {
-        category.data.forEach(item => {
-            moduleMap.set(item.id, item);
-        });
-    });
-
-    window.moduleMap = moduleMap;
+    window.electronAPI.setGlobal('AllData', allData);
 }
 
 // Setup event listeners
-document.getElementById('mouse-tool').addEventListener('click', handleToolClick);
-document.getElementById('trash-tool').addEventListener('click', handleToolClick);
+document.getElementById('back-button').addEventListener('click', () => {
+    window.location.href = '../../index.html'; // Adjust path as needed
+});
+document.getElementById('research-button').addEventListener('click', () => {
+    document.getElementById('research-overlay').classList.remove('hidden');
+});
+
 document.getElementById('play-button').addEventListener('click', handlePlayClick);
+
+// Clear selection when clicking outside (only for grid selections)
+document.addEventListener('click', (e) => {
+    if (selectedElement && selectedElement.source === 'grid' &&
+        !e.target.closest('.sidebar-element') &&
+        !e.target.closest('.grid-cell') &&
+        !e.target.closest('.element')) {
+
+        // Remove selected grid element
+        const sourceKey = `${selectedElement.x},${selectedElement.y}`;
+        if (shipData[sourceKey]) {
+            const componentData = shipData[sourceKey];
+            const elementType = typeof componentData === 'string' ? componentData : componentData.id;
+            inventory[elementType]++;
+            delete shipData[sourceKey];
+        }
+
+        clearSelection();
+        updateGrid();
+        updateInventory();
+        saveShipData();
+    }
+});
+
+// Load existing ship data from JSON file
+async function loadExistingShipData() {
+    try {
+        const shipGrid = await loadFile('Data/Ship/ship.json');
+        //console.log('Loaded ship grid:', shipGrid);
+
+        if (shipGrid && Array.isArray(shipGrid)) {
+            // Convert 2D array back to shipData object format
+            shipData = {};
+
+            for (let y = 0; y < shipGrid.length; y++) {
+                for (let x = 0; x < shipGrid[y].length; x++) {
+                    const cell = shipGrid[y][x];
+                    if (cell && cell.id) {
+                        const key = `${x},${y}`;
+                        shipData[key] = {
+                            id: cell.id,
+                            rotation: cell.rotation || 'UP' // Default to UP if no rotation specified
+                        };
+                    }
+                }
+            }
+
+            //console.log('Converted shipData:', shipData);
+            return true;
+        }
+    } catch (error) {
+        console.log('No existing ship data found or error loading:', error);
+        // This is fine - we'll start with an empty ship
+        shipData = {};
+        return false;
+    }
+}
+
+function updateInventoryFromPlacedComponents() {
+    // Count how many of each component are placed on the grid
+    const placedComponents = {};
+
+    Object.values(shipData).forEach(componentData => {
+        const componentType = typeof componentData === 'string' ? componentData : componentData.id;
+        placedComponents[componentType] = (placedComponents[componentType] || 0) + 1;
+    });
+
+    // Reduce inventory by the number of placed components
+    components.forEach(comp => {
+        if (comp.maxValue > 0) {
+            const placedCount = placedComponents[comp.name] || 0;
+            inventory[comp.name] = Math.max(0, comp.maxValue - placedCount);
+        }
+    });
+}
 
 // Initialize everything
 async function init() {
-    await loadShipData(); // Load player data if there is any
+
+    await loadShipData();
+
     initInventory();
+
+    await loadExistingShipData();
+    // Update inventory based on what's already placed on the grid
+    updateInventoryFromPlacedComponents();
+
     createSidebarComponents();
     createGrid();
     updateGrid();
@@ -360,7 +602,7 @@ async function init() {
     window.Points = await loadResearchPoints();
     //console.log("Points: ", window.Points);
 
-    window.researchTree =  new Research()
+    window.researchTree = new Research()
 
     await initializeResearchOverlay();
 }
