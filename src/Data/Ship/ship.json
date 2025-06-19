@@ -25,23 +25,29 @@
     null,
     null,
     null,
-    {
-      "id": "weapon_blaster",
-      "rotation": "NONE"
-    },
-    {
-      "id": "weapon_plasma-cannon",
-      "rotation": "UP"
-    },
-    {
-      "id": "weapon_blaster",
-      "rotation": "NONE"
-    },
+    null,
+    null,
+    null,
     null,
     null,
     null
   ],
   [
+    null,
+    null,
+    null,
+    null,
+    {
+      "id": "weapon_blaster",
+      "rotation": "UP"
+    },
+    null,
+    null,
+    null,
+    null
+  ],
+  [
+    null,
     null,
     null,
     {
@@ -49,41 +55,14 @@
       "rotation": "LEFT"
     },
     {
-      "id": "armor_basic",
-      "rotation": "NONE"
-    },
-    {
-      "id": "hull_basic",
-      "rotation": "NONE"
-    },
-    {
-      "id": "armor_basic",
-      "rotation": "NONE"
+      "id": "reactor_basic",
+      "rotation": "UP"
     },
     {
       "id": "weapon_blaster",
       "rotation": "RIGHT"
     },
     null,
-    null
-  ],
-  [
-    null,
-    null,
-    null,
-    {
-      "id": "hull_basic",
-      "rotation": "NONE"
-    },
-    {
-      "id": "reactor_basic",
-      "rotation": "NONE"
-    },
-    {
-      "id": "hull_basic",
-      "rotation": "NONE"
-    },
-    null,
     null,
     null
   ],
@@ -91,18 +70,12 @@
     null,
     null,
     null,
+    null,
     {
-      "id": "armor_basic",
-      "rotation": "NONE"
+      "id": "weapon_blaster",
+      "rotation": "DOWN"
     },
-    {
-      "id": "hull_basic",
-      "rotation": "NONE"
-    },
-    {
-      "id": "armor_basic",
-      "rotation": "NONE"
-    },
+    null,
     null,
     null,
     null
@@ -111,15 +84,9 @@
     null,
     null,
     null,
-    {
-      "id": "engine_basic",
-      "rotation": "NONE"
-    },
     null,
-    {
-      "id": "engine_basic",
-      "rotation": "NONE"
-    },
+    null,
+    null,
     null,
     null,
     null
