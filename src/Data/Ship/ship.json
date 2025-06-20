@@ -41,26 +41,20 @@
   [
     null,
     null,
-    {
-      "id": "weapon_blaster",
-      "rotation": "LEFT"
-    },
+    null,
     {
       "id": "armor_basic",
-      "rotation": "UP"
+      "rotation": "NONE"
     },
     {
       "id": "hull_basic",
-      "rotation": "UP"
+      "rotation": "NONE"
     },
     {
       "id": "armor_basic",
-      "rotation": "UP"
+      "rotation": "NONE"
     },
-    {
-      "id": "weapon_blaster",
-      "rotation": "RIGHT"
-    },
+    null,
     null,
     null
   ],
@@ -70,15 +64,15 @@
     null,
     {
       "id": "hull_basic",
-      "rotation": "UP"
+      "rotation": "NONE"
     },
     {
       "id": "reactor_basic",
-      "rotation": "UP"
+      "rotation": "NONE"
     },
     {
       "id": "hull_basic",
-      "rotation": "UP"
+      "rotation": "NONE"
     },
     null,
     null,
@@ -90,15 +84,15 @@
     null,
     {
       "id": "armor_basic",
-      "rotation": "UP"
+      "rotation": "NONE"
     },
     {
       "id": "hull_basic",
-      "rotation": "UP"
+      "rotation": "NONE"
     },
     {
       "id": "armor_basic",
-      "rotation": "UP"
+      "rotation": "NONE"
     },
     null,
     null,
