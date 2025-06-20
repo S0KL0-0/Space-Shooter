@@ -1,5 +1,7 @@
 # Space-Shooter
 
+[Gameplay](https://www.youtube.com/watch?v=g74-xPgA474)
+
 # Installation Guide
 
 ## 1. Install Node.js
