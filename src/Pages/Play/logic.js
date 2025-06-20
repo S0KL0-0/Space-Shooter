@@ -63,7 +63,7 @@ function createSidebarComponents() {
         img.style.height = '100%';
         img.style.objectFit = 'contain';
 
-        // Add error handling for images in Electron
+        // Error handling for images in Electron
         img.onerror = function() {
             console.warn(`Failed to load image: ${comp.image}`);
             // Fallback to text display
@@ -83,7 +83,6 @@ function createSidebarComponents() {
     });
 }
 
-// Create grid
 function createGrid() {
     const grid = document.getElementById('ship-grid');
     grid.innerHTML = '';
@@ -139,7 +138,6 @@ function handleSidebarElementClick(e) {
     e.currentTarget.classList.add('selected');
 }
 
-// Modified handleGridElementClick to fix rotation logic
 function handleGridElementClick(e, elementType, x, y) {
     e.stopPropagation();
 
@@ -428,7 +426,6 @@ function updateGrid() {
         cell.innerHTML = '';
         cell.classList.remove('occupied');
 
-        // Add element if exists
         if (shipData[key]) {
             const componentData = shipData[key];
             const componentType = typeof componentData === 'string' ? componentData : componentData.id;
@@ -441,7 +438,6 @@ function updateGrid() {
     });
 }
 
-// Modified saveShipData function
 function saveShipData() {
     // Create a 2D array representing the grid
     const shipGrid = [];
@@ -467,11 +463,9 @@ function saveShipData() {
             const component = window.allGameData?.weapons?.get(componentId) ||
                 window.allGameData?.modules?.get(componentId);
 
-            // Fix rotation logic: if component can't rotate, set to "NONE", otherwise ensure valid rotation
             if (component && component.placement_rules && component.placement_rules.rotation === false) {
                 rotation = "NONE";
             } else if (!rotation || rotation === "NONE") {
-                // If it can rotate but has no rotation or NONE, set to UP
                 rotation = "UP";
             }
 
@@ -482,12 +476,9 @@ function saveShipData() {
         }
     });
 
-    // Save ship data
     const shipFilePath = 'Data/Ship/ship.json';
 
-    // Save both files
     if (window.electronAPI && window.electronAPI.saveJSON) {
-        // Save ship data
         window.electronAPI.saveJSON(shipFilePath, shipGrid)
             .catch(error => {
                 console.error('Failed to save ship data:', error);
@@ -500,7 +491,6 @@ function saveShipData() {
 }
 
 async function loadShipData() {
-    // Load all data using the new load function
     const allData = await load();
     //console.log("All Data: ", allData);
 
@@ -564,7 +554,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Load existing ship data from JSON file
 async function loadExistingShipData() {
     try {
         const shipGrid = await loadFile('Data/Ship/ship.json');

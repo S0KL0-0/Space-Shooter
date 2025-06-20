@@ -1,4 +1,3 @@
-// Simple screen shake effect
 function screenShake() {
     if (!app.stage) return;
 
@@ -28,7 +27,7 @@ function screenShake() {
     }, 16);
 }
 
-// Create death effect (explosion)
+// (explosion)
 function createDeathEffect() {
     if (!playerShip) return;
 

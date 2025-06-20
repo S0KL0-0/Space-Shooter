@@ -38,27 +38,11 @@ class Research {
             prerequisites,
             customData,
             status: status ? 'researched' : (cost === 0 ? 'researched' : 'locked')
-            //status: cost === 0 ? 'researched' : 'locked'
         };
 
         this.nodes[tab][id] = node;
         this.updateNodeStatuses();
         return node;
-    }
-
-    removeNode(tabId, id) {
-        if (this.nodes[tabId] && this.nodes[tabId][id]) {
-            // Remove dependencies
-            Object.values(this.nodes[tabId]).forEach(node => {
-                node.prerequisites = node.prerequisites.filter(prereq => prereq !== id);
-            });
-            delete this.nodes[tabId][id];
-            this.updateNodeStatuses();
-        }
-    }
-
-    getNode(tabId, id) {
-        return this.nodes[tabId] ? this.nodes[tabId][id] : null;
     }
 
     updateNodeStatuses() {
@@ -169,7 +153,6 @@ class Research {
         this.updateResearchedNodeInJson(nodeId, 'researched');
         this.updatePointsInJson(this.playerResources);
 
-        // Add this line to refresh ship builder data
         this.refreshShipBuilderData();
 
         return true;
@@ -387,7 +370,7 @@ class Research {
     }
 
     switchTab(tabId) {
-        // Update tab buttons
+
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabIndex = this.tabs.findIndex(tab => tab.id === tabId);
 
@@ -395,7 +378,6 @@ class Research {
             button.classList.toggle('active', index === tabIndex);
         });
 
-        // Update tab contents
         this.tabs.forEach(tab => {
             const tabContent = document.getElementById(`tab-content-${tab.id}`);
             if (tabContent) {
@@ -596,7 +578,6 @@ class Research {
     }
 }
 
-// Updated to use existing loaded data instead of loading new data
 function loadResearch() {
     // Use the research data that was already loaded and stored in window.allGameData
     if (window.allGameData && window.allGameData.research) {
@@ -607,7 +588,6 @@ function loadResearch() {
     }
 }
 
-// Updated to use existing loaded data
 async function loadResearchPoints() {
     try {
         // Load points from the JSON file

@@ -26,7 +26,6 @@ ipcMain.handle('get-global', (event, key) => {
     return sharedData[key]
 })
 
-// Handle JSON loading
 ipcMain.handle('load-json', async (event, filePath) => {
     try {
         // Resolve path relative to app directory
@@ -66,7 +65,6 @@ ipcMain.handle('update-json', async (event, filePath, item, data) => {
     }
 });
 
-// Handle JSON saving (create or overwrite)
 ipcMain.handle('save-json', async (event, filePath, data) => {
     try {
         // Resolve path relative to app directory
@@ -89,7 +87,6 @@ ipcMain.handle('save-json', async (event, filePath, data) => {
     }
 });
 
-// Handle PNG saving
 ipcMain.handle('save-png', async (event, filePath, base64Data) => {
     try {
         // Resolve path relative to app directory

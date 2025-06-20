@@ -1,5 +1,3 @@
-// Enemy system for the space shooter game - FIXED FOR WORLD SPACE
-// Replace your existing enemy.js with this corrected version
 
 // Enemy configuration
 const ENEMY_CONFIG = {
@@ -99,7 +97,6 @@ function createEnemy(type = null) {
     return enemy;
 }
 
-// Update enemy behavior
 function updateEnemies(deltaTime) {
     const currentTime = Date.now();
 
@@ -165,7 +162,6 @@ function updateEnemies(deltaTime) {
     }
 }
 
-// Enemy shooting function - NOW USES WORLD SPACE
 function enemyShoot(enemy) {
     // Calculate direction to player in world space
     const dx = playerWorldX - enemy.worldX;
@@ -255,7 +251,6 @@ function updateEnemyBullets(deltaTime) {
     }
 }
 
-// Player bullet vs enemy collision - ALREADY CORRECT
 function checkPlayerBulletEnemyCollisions() {
     for (let i = bullets.length - 1; i >= 0; i--) {
         const bullet = bullets[i];
@@ -345,7 +340,6 @@ function createHitEffect(x, y) {
     }
 }
 
-// Create enemy death effect
 function createEnemyDeathEffect(enemy) {
     for (let i = 0; i < 15; i++) {
         const particle = new PIXI.Graphics();
@@ -382,7 +376,6 @@ function createEnemyDeathEffect(enemy) {
     }
 }
 
-// Add this to your main update function
 function updateEnemySystem(deltaTime) {
     updateEnemySpawning(deltaTime);
     updateEnemies(deltaTime);

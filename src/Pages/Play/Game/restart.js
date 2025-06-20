@@ -23,12 +23,11 @@ function restartGame() {
     bullets = [];
     enemies = [];
 
-    // ADD THIS LINE - Clear enemy system
+    // Clear enemy system
     clearAllEnemies();
 
     clearAllBullets();
 
-    // Rest of your existing restart code...
     app.stage.removeChildren();
     existingTiles.clear();
     lastTileCheckX = 0;
@@ -37,7 +36,7 @@ function restartGame() {
 
     backgroundFill();
 
-    // Recreate player ship...
+    // Recreate player ship
     playerShip = PIXI.Sprite.from('../../../Data/Ship/ship.png');
     playerShip.scale.set(shipSize);
     playerShip.x = app.screen.width / 2;

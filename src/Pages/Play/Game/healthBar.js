@@ -6,7 +6,6 @@ const healthBarStyle = {
     y: 20
 };
 
-// Create health UI function - call this in startGame()
 function createHealthUI() {
     // Health bar background
     const healthBarBg = new PIXI.Graphics();
@@ -34,7 +33,6 @@ function createHealthUI() {
     app.stage.addChild(healthText);
 }
 
-// Update health bar visual
 function updateHealthBar() {
     if (!healthBar) return;
 
@@ -65,9 +63,8 @@ function updateHealthBar() {
     }
 }
 
-// Main function to remove health
 function takeDamage(damage, damageSource = "unknown") {
-    // Check if player is invulnerable
+
     if (isInvulnerable) {
         console.log(`Damage blocked by invulnerability: ${damage} from ${damageSource}`);
         return false;
@@ -90,13 +87,11 @@ function takeDamage(damage, damageSource = "unknown") {
         return true; // Player died
     }
 
-    // Add screen shake effect for damage feedback
     screenShake();
 
     return false; // Player survived
 }
 
-// Function to heal player
 function healPlayer(healAmount) {
     const oldHealth = playerHealth;
     playerHealth = Math.min(maxHealth, playerHealth + healAmount);
@@ -120,7 +115,6 @@ function environmentalDamage(damageAmount = 5) {
     return takeDamage(damageAmount, "environmental hazard");
 }
 
-// Health powerup function
 function collectHealthPowerup(healAmount = 25) {
     return healPlayer(healAmount);
 }

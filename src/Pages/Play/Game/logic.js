@@ -1,4 +1,3 @@
-// Create PixiJS application
 const app = new PIXI.Application({
     width: 800,
     height: 600,
@@ -125,12 +124,10 @@ function seedRandom(x, y) {
     return (seed ^ (seed >>> 16)) / 4294967296 + 0.5; // Return 0-1
 }
 
-// Add these variables
 let existingTiles = new Map();
 let lastTileCheckX = 0;
 let lastTileCheckY = 0;
 
-// Modified backgroundFill - now tracks tiles
 function backgroundFill() {
     backgroundContainer = new PIXI.Container();
     app.stage.addChildAt(backgroundContainer, 0);
@@ -169,7 +166,6 @@ function createTileAt(worldX, worldY, seedX, seedY) {
     existingTiles.set(tileKey, tile);
 }
 
-// Updated moveBackground function
 function moveBackground(deltaX, deltaY) {
     if (backgroundContainer) {
         backgroundContainer.x -= deltaX;
@@ -290,7 +286,7 @@ function getScreenGunPositions(ship) {
         const cos = Math.cos(ship.rotation);
         const sin = Math.sin(ship.rotation);
 
-        // Apply ship size scaling - use shipSize variable instead of ship.scale
+        // Apply ship size scaling
         const scaledX = gunPos.x * shipSize;
         const scaledY = gunPos.y * shipSize;
 
@@ -404,7 +400,6 @@ function makeInvulnerable() {
     }
 }
 
-// Handle player death
 function handlePlayerDeath() {
     console.log("Player has died!");
     gameState = 'gameOver';
@@ -420,7 +415,6 @@ function handlePlayerDeath() {
     createDeathEffect();
 }
 
-// Show game over screen
 function showGameOverScreen() {
     const gameOverStyle = new PIXI.TextStyle({
         fontFamily: 'Arial',
@@ -454,7 +448,6 @@ function showGameOverScreen() {
     app.view.addEventListener('click', restartGame);
 }
 
-// Update invulnerability timer - add this to your main update() function
 function updateInvulnerability(deltaTime) {
     if (isInvulnerable) {
         invulnerabilityTimer -= deltaTime * 1000; // Convert to milliseconds
@@ -499,7 +492,6 @@ function startGame() {
     backgroundFill()
 
 
-    //Temporary sprite add player bult ship later
     playerShip = PIXI.Sprite.from('../../../Data/Ship/ship.png');
 
     playerShip.scale.set(shipSize);
@@ -591,18 +583,15 @@ function update() {
         normalizedFloatY = floatY / inputLength;
     }
 
-    // FIXED: Calculate world movement directly
     const worldMoveX = normalizedFloatX * moveSpeed;
     const worldMoveY = normalizedFloatY * moveSpeed;
 
-    // UPDATE PLAYER WORLD POSITION
     playerWorldX += worldMoveX;
     playerWorldY += worldMoveY;
 
     // Move background in opposite direction (this creates the illusion of player movement)
     moveBackground(worldMoveX, worldMoveY);
 
-    // Existing rotation code...
     const xDiff = mouseX - playerShip.x;
     const yDiff = mouseY - playerShip.y;
     const angle = Math.atan2(yDiff, xDiff);
@@ -610,7 +599,6 @@ function update() {
 
     updateBullets(frameTime / 1000);
 
-    // Update enemy system
     updateEnemySystem(frameTime / 1000);
 }
 

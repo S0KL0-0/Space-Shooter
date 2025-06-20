@@ -11,7 +11,6 @@ const SHIP_RENDER_CONFIG = {
     gridLineWidth: 1        // Grid line width
 };
 
-// Get rotation angle in degrees for rendering
 function getRotationAngle(rotation) {
     const rotationAngles = {
         'UP': 0,
@@ -22,7 +21,6 @@ function getRotationAngle(rotation) {
     return rotationAngles[rotation] || 0;
 }
 
-// Load and rotate image
 function loadAndRotateImage(imageSrc, rotation) {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -184,7 +182,7 @@ async function constructShip() {
             throw new Error('savePNG function not available');
         }
 
-        return canvas; // Return canvas in case you want to use it elsewhere
+        return canvas;
 
     } catch (error) {
         console.error('Failed to construct ship image:', error);
