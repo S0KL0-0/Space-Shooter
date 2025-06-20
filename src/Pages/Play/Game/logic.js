@@ -198,7 +198,6 @@ function spawnNewTiles(centerX, centerY) {
     }
 }
 
-
 function updateMovementInput(){
     floatX = 0;
     floatY = 0;
@@ -207,9 +206,9 @@ function updateMovementInput(){
         // Both pressed - use the most recent one
         floatX = inputQueue.x[inputQueue.x.length - 1] === 'KeyA' ? -1 : 1;
     } else if (keys['KeyA']) {
-        floatX = -1; // A key = move left (negative X)
+        floatX = -1; // FIXED: A key (left) should be -1
     } else if (keys['KeyD']) {
-        floatX = 1;  // D key = move right (positive X)
+        floatX = 1;  // FIXED: D key (right) should be +1
     } else {
         floatX = 0;
     }
@@ -219,14 +218,13 @@ function updateMovementInput(){
         // Both pressed - use the most recent one
         floatY = inputQueue.y[inputQueue.y.length - 1] === 'KeyW' ? -1 : 1;
     } else if (keys['KeyW']) {
-        floatY = -1; // W key = move up (negative Y)
+        floatY = -1; // FIXED: W key (up) should be -1
     } else if (keys['KeyS']) {
-        floatY = 1;  // S key = move down (positive Y)
+        floatY = 1;  // FIXED: S key (down) should be +1
     } else {
         floatY = 0;
     }
 }
-
 
 
 
@@ -593,14 +591,16 @@ function update() {
         normalizedFloatY = floatY / inputLength;
     }
 
-    const backgroundMoveX = -normalizedFloatX * moveSpeed;
-    const backgroundMoveY = -normalizedFloatY * moveSpeed;
+    // FIXED: Calculate world movement directly
+    const worldMoveX = normalizedFloatX * moveSpeed;
+    const worldMoveY = normalizedFloatY * moveSpeed;
 
-    // UPDATE PLAYER WORLD POSITION - This is the key addition
-    playerWorldX += -backgroundMoveX;
-    playerWorldY += -backgroundMoveY;
+    // UPDATE PLAYER WORLD POSITION
+    playerWorldX += worldMoveX;
+    playerWorldY += worldMoveY;
 
-    moveBackground(backgroundMoveX, backgroundMoveY);
+    // Move background in opposite direction (this creates the illusion of player movement)
+    moveBackground(worldMoveX, worldMoveY);
 
     // Existing rotation code...
     const xDiff = mouseX - playerShip.x;
