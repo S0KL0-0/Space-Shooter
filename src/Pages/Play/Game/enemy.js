@@ -11,7 +11,8 @@ const ENEMY_CONFIG = {
         shootCooldown: 2000, // 2 seconds
         bulletSpeed: 150,
         scale: 0.3,
-        scoreValue: 100
+        scoreValue: 100,
+        points: 10
     },
     enemy_3_gun: {
         sprite: '../../../Assets/Enemies/enemy_3_gun.png',
@@ -21,7 +22,8 @@ const ENEMY_CONFIG = {
         shootCooldown: 1500, // 1.5 seconds
         bulletSpeed: 180,
         scale: 0.35,
-        scoreValue: 200
+        scoreValue: 200,
+        points: 20
     }
 };
 
@@ -30,7 +32,7 @@ let enemyBullets = [];
 
 // Enemy spawn system
 let enemySpawnTimer = 0;
-const ENEMY_SPAWN_INTERVAL = 3000; // 3 seconds between spawns
+const ENEMY_SPAWN_INTERVAL = 100; // 3 seconds between spawns
 let maxEnemies = 5; // Maximum enemies on screen at once
 
 // Calculate spawn radius based on screen size
@@ -92,7 +94,7 @@ function createEnemy(type = null) {
     app.stage.addChild(enemy);
     enemies.push(enemy);
 
-    console.log(`Spawned ${enemyType} at world (${spawnPos.worldX.toFixed(1)}, ${spawnPos.worldY.toFixed(1)})`);
+    //console.log(`Spawned ${enemyType} at world (${spawnPos.worldX.toFixed(1)}, ${spawnPos.worldY.toFixed(1)})`);
 
     return enemy;
 }
@@ -288,8 +290,7 @@ function checkPlayerBulletEnemyCollisions() {
                     app.stage.removeChild(enemy);
                     enemies.splice(j, 1);
 
-                    // Add score (if you have a scoring system)
-                    console.log(`Enemy destroyed! Score: ${enemy.scoreValue}`);
+                    onEnemyDefeated(enemy);
                 }
 
                 break; // Bullet can only hit one enemy
@@ -412,4 +413,46 @@ function clearAllBullets() {
         app.stage.removeChild(bullet);
     });
     bullets = [];
+}
+
+
+async function addResearchPoints(points) {
+    try {
+        // Load current points from the JSON file
+        const data = await window.electronAPI.loadJSON('Data/other.json');
+        const currentPoints = data && typeof data.Points === 'number' ? data.Points : 0;
+
+        // Add the new points
+        const newPoints = currentPoints + points;
+
+        // Update just the Points property in the JSON file
+        await window.electronAPI.updateJSON('Data/other.json', 'Points', newPoints);
+
+        return newPoints;
+    } catch (error) {
+        console.error('Failed to add research points:', error);
+        return 0;
+    }
+}
+
+function onEnemyDefeated(enemy) {
+    // Get enemy type from the enemy object
+    const enemyType = enemy.enemyType || 'enemy_1_gun'; // fallback to default type
+
+    // Get points from enemy config
+    const enemyConfig = ENEMY_CONFIG[enemyType];
+    if (enemyConfig && enemyConfig.points) {
+        // Add research points asynchronously
+        addResearchPoints(enemyConfig.points).then(newTotal => {
+            console.log(`Enemy defeated! Gained ${enemyConfig.points} points. Total: ${newTotal}`);
+        }).catch(error => {
+            console.error('Error adding research points:', error);
+        });
+    }
+
+    // Add to score if there's a global score variable
+    if (typeof score !== 'undefined' && enemyConfig && enemyConfig.scoreValue) {
+        score += enemyConfig.scoreValue;
+    }
+
 }
