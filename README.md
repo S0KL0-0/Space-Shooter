@@ -33,6 +33,7 @@ Follow the steps illustrated in the images:
 - Step 1: ![Step 1](Images/step-1.png)
 - Step 2: ![Step 2](Images/step-2.png)
 - Step 3: ![Step 3](Images/step-3.png)
+- Step 4: ![Step 4](Images/step-4.png)
 
 Make sure to complete each step in order before proceeding.
 
