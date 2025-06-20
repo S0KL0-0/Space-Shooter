@@ -11,11 +11,22 @@ document.getElementById('game-container').appendChild(app.view);
 // Game settings
 const FPS = 60;
 const frameTime = 1000 / FPS;
+let mouseX = 0;
+let mouseY = 0;
+const maxSpeed = 200;
+const acceleration = 0.5;
+const deceleration = 0.5;
+const dash = 0;
+
+// Ship settings
+const shipScale = 0.5;
 
 // Game states
 let gameState = 'waiting'; // waiting, countdown, playing
 let countdownValue = 3;
 let lastTime = 0;
+let allData = null;
+let playerShip = null;
 
 // Create text style
 const textStyle = new PIXI.TextStyle({
@@ -39,21 +50,14 @@ countdownText.y = app.screen.height / 2;
 countdownText.visible = false;
 app.stage.addChild(countdownText);
 
-// Click to start
+// Load data before starting
 document.addEventListener('DOMContentLoaded', async () => {
-    // Wait for data to load
-    const allData = await window.electronAPI.getGlobal('AllData');
-    console.log(allData);
+    allData = await window.electronAPI.getGlobal('AllData');
+    console.log('Loaded AllData:', allData);
 
-    // Now allow click to start
+    // Enable starting the game only after data is loaded
     app.view.addEventListener('click', startCountdown);
 });
-
-
-async function loadData() {
-    const allData = await window.electronAPI.getGlobal('AllData')
-    console.log(allData)
-}
 
 function startCountdown() {
     if (gameState !== 'waiting') return;
@@ -78,7 +82,21 @@ function startGame() {
     gameState = 'playing';
     countdownText.visible = false;
 
-    // Start main game loop
+    // Load the player ship — you can use data from allData if needed
+    playerShip = PIXI.Sprite.from('../../../Data/Ship/ship.png');
+    playerShip.x = app.screen.width / 2;
+    playerShip.y = app.screen.height / 2;
+    playerShip.scale.set(shipScale);
+    playerShip.anchor.set(0.5);
+    app.stage.addChild(playerShip);
+
+    // Track mouse position for ship rotation
+    app.view.addEventListener('mousemove', function(event) {
+        const rect = app.view.getBoundingClientRect();
+        mouseX = event.clientX - rect.left;
+        mouseY = event.clientY - rect.top;
+    });
+
     requestAnimationFrame(gameLoop);
 }
 
@@ -94,5 +112,10 @@ function gameLoop(currentTime) {
 }
 
 function update() {
+    if (!playerShip) return;
 
+    const xDiff = mouseX - playerShip.x;
+    const yDiff = mouseY - playerShip.y;
+    const angle = Math.atan2(yDiff, xDiff);
+    playerShip.rotation = angle + Math.PI / 2;
 }
