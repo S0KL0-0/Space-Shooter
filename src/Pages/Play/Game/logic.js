@@ -32,6 +32,7 @@ let isInvulnerable = false;
 let invulnerabilityTimer = 0;
 const invulnerabilityDuration = 2000; // 2 seconds in milliseconds
 
+let shipSize = 0.25;
 
 let playerWorldX = 0;
 let playerWorldY = 0;
@@ -152,14 +153,14 @@ function createTileAt(worldX, worldY, seedX, seedY) {
 
     if (existingTiles.has(tileKey)) return; // Don't create if already exists
 
-    const tile = PIXI.Sprite.from('../../../Assets/Modules/Modules/Images/background/background.png');
+    const tile = PIXI.Sprite.from('../../../Assets/background.png');
 
     tile.x = worldX + TILE_SIZE / 2;
     tile.y = worldY + TILE_SIZE / 2;
     tile.anchor.set(0.5);
 
     const randomRotation = (Math.floor(seedRandom(seedX, seedY) * 4) * Math.PI) / 2;
-    tile.rotation = randomRotation;
+    tile.rotation = randomRotation + Math.PI / 2;
 
     const brightness = 0.9 + (seedRandom(seedX + 100, seedY + 100) * 0.2);
     tile.tint = PIXI.utils.rgb2hex([brightness, brightness, brightness]);
@@ -198,9 +199,7 @@ function spawnNewTiles(centerX, centerY) {
 }
 
 
-// movement function
 function updateMovementInput(){
-
     floatX = 0;
     floatY = 0;
 
@@ -208,9 +207,9 @@ function updateMovementInput(){
         // Both pressed - use the most recent one
         floatX = inputQueue.x[inputQueue.x.length - 1] === 'KeyA' ? -1 : 1;
     } else if (keys['KeyA']) {
-        floatX = 1;
+        floatX = -1; // A key = move left (negative X)
     } else if (keys['KeyD']) {
-        floatX = -1;
+        floatX = 1;  // D key = move right (positive X)
     } else {
         floatX = 0;
     }
@@ -220,13 +219,12 @@ function updateMovementInput(){
         // Both pressed - use the most recent one
         floatY = inputQueue.y[inputQueue.y.length - 1] === 'KeyW' ? -1 : 1;
     } else if (keys['KeyW']) {
-        floatY = 1;
+        floatY = -1; // W key = move up (negative Y)
     } else if (keys['KeyS']) {
-        floatY = -1;
+        floatY = 1;  // S key = move down (positive Y)
     } else {
         floatY = 0;
     }
-
 }
 
 
@@ -234,7 +232,7 @@ function updateMovementInput(){
 
 function getGunPositions(shipGrid) {
     const gunPositions = [];
-    const cellSize = 32;
+    const cellSize = 100;
     const gridWidth = shipGrid[0].length;
     const gridHeight = shipGrid.length;
 
@@ -294,22 +292,21 @@ function getScreenGunPositions(ship) {
         const cos = Math.cos(ship.rotation);
         const sin = Math.sin(ship.rotation);
 
-        // Apply ship scale
-        const scaledX = gunPos.x * ship.scale.x;
-        const scaledY = gunPos.y * ship.scale.y;
+        // Apply ship size scaling - use shipSize variable instead of ship.scale
+        const scaledX = gunPos.x * shipSize;
+        const scaledY = gunPos.y * shipSize;
 
         // Rotate gun position around ship center
         const rotatedX = scaledX * cos - scaledY * sin;
         const rotatedY = scaledX * sin + scaledY * cos;
 
-        // IMPORTANT: Combine ship rotation with weapon's individual rotation
-        // This makes the weapon maintain its relative direction even when ship rotates
+        // Combine ship rotation with weapon's individual rotation
         const finalGunRotation = ship.rotation + gunPos.rotation;
 
         screenPositions.push({
             x: ship.x + rotatedX,
             y: ship.y + rotatedY,
-            rotation: finalGunRotation, // Combined rotation
+            rotation: finalGunRotation,
             weaponType: gunPos.weaponType
         });
     });
@@ -343,19 +340,24 @@ function getDirectionName(radians) {
     return "UNKNOWN";
 }
 
-// Fixed createBullet function
 function createBullet(x, y, angle, weaponType) {
-    const bullet = PIXI.Sprite.from('../../../Data/Bullets/bullet.png');
+    const bullet = PIXI.Sprite.from('../../../Assets/bullet.png');
+
+    // Convert screen position to world position
+    bullet.worldX = x - app.screen.width / 2 + playerWorldX;
+    bullet.worldY = y - app.screen.height / 2 + playerWorldY;
+
+    // Set screen position initially
     bullet.x = x;
     bullet.y = y;
-    // Adjust rotation - your ship rotation already accounts for sprite orientation
-    bullet.rotation = angle;
+
+    bullet.rotation = angle + Math.PI / 2;
     bullet.anchor.set(0.5);
 
-    // Calculate bullet velocity based on the ship's facing direction
+    // Calculate bullet velocity in world space
     const speed = 200; // Bullet speed in pixels per second
-    bullet.vx = Math.cos(angle) * speed;
-    bullet.vy = Math.sin(angle) * speed;
+    bullet.worldVx = Math.cos(angle) * speed;
+    bullet.worldVy = Math.sin(angle) * speed;
 
     // Add lifetime to prevent memory leaks
     bullet.lifetime = 5000; // 5 seconds
@@ -365,138 +367,32 @@ function createBullet(x, y, angle, weaponType) {
     bullets.push(bullet);
 }
 
-// Add bullet update function to your update() function
 function updateBullets(deltaTime) {
     for (let i = bullets.length - 1; i >= 0; i--) {
         const bullet = bullets[i];
 
-        // Move bullet in screen space
-        bullet.x += bullet.vx * deltaTime;
-        bullet.y += bullet.vy * deltaTime;
+        // Move bullet in world space
+        bullet.worldX += bullet.worldVx * deltaTime;
+        bullet.worldY += bullet.worldVy * deltaTime;
+
+        // Convert world position to screen position
+        bullet.x = bullet.worldX - playerWorldX + app.screen.width / 2;
+        bullet.y = bullet.worldY - playerWorldY + app.screen.height / 2;
 
         // Update age
         bullet.age += deltaTime * 1000; // Convert to milliseconds
 
-        // Remove bullets that are too old or off screen
-        if (bullet.age > bullet.lifetime ||
-            bullet.x < -100 || bullet.x > app.screen.width + 100 ||
-            bullet.y < -100 || bullet.y > app.screen.height + 100) {
+        // Remove bullets that are too old or too far from player in world space
+        const worldDistanceFromPlayer = Math.sqrt(
+            Math.pow(bullet.worldX - playerWorldX, 2) +
+            Math.pow(bullet.worldY - playerWorldY, 2)
+        );
 
+        if (bullet.age > bullet.lifetime || worldDistanceFromPlayer > 1000) {
             app.stage.removeChild(bullet);
             bullets.splice(i, 1);
         }
     }
-}
-
-
-
-// Health UI styles
-const healthBarStyle = {
-    width: 200,
-    height: 20,
-    x: 20,
-    y: 20
-};
-
-// Create health UI function - call this in startGame()
-function createHealthUI() {
-    // Health bar background
-    const healthBarBg = new PIXI.Graphics();
-    healthBarBg.beginFill(0x333333);
-    healthBarBg.drawRect(healthBarStyle.x, healthBarStyle.y, healthBarStyle.width, healthBarStyle.height);
-    healthBarBg.endFill();
-    app.stage.addChild(healthBarBg);
-
-    // Health bar foreground
-    healthBar = new PIXI.Graphics();
-    updateHealthBar();
-    app.stage.addChild(healthBar);
-
-    // Health text
-    const healthTextStyle = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 16,
-        fill: '#ffffff',
-        align: 'left'
-    });
-
-    healthText = new PIXI.Text(`Health: ${playerHealth}/${maxHealth}`, healthTextStyle);
-    healthText.x = healthBarStyle.x;
-    healthText.y = healthBarStyle.y + healthBarStyle.height + 5;
-    app.stage.addChild(healthText);
-}
-
-// Update health bar visual
-function updateHealthBar() {
-    if (!healthBar) return;
-
-    healthBar.clear();
-
-    // Calculate health percentage
-    const healthPercent = Math.max(0, playerHealth / maxHealth);
-    const barWidth = healthBarStyle.width * healthPercent;
-
-    // Choose color based on health percentage
-    let healthColor;
-    if (healthPercent > 0.6) {
-        healthColor = 0x00ff00; // Green
-    } else if (healthPercent > 0.3) {
-        healthColor = 0xffff00; // Yellow
-    } else {
-        healthColor = 0xff0000; // Red
-    }
-
-    // Draw health bar
-    healthBar.beginFill(healthColor);
-    healthBar.drawRect(healthBarStyle.x, healthBarStyle.y, barWidth, healthBarStyle.height);
-    healthBar.endFill();
-
-    // Update text
-    if (healthText) {
-        healthText.text = `Health: ${Math.max(0, playerHealth)}/${maxHealth}`;
-    }
-}
-
-// Main function to remove health
-function takeDamage(damage, damageSource = "unknown") {
-    // Check if player is invulnerable
-    if (isInvulnerable) {
-        console.log(`Damage blocked by invulnerability: ${damage} from ${damageSource}`);
-        return false;
-    }
-
-    // Apply damage
-    playerHealth -= damage;
-    console.log(`Player took ${damage} damage from ${damageSource}. Health: ${playerHealth}/${maxHealth}`);
-
-    // Update UI
-    updateHealthBar();
-
-    // Make player temporarily invulnerable
-    makeInvulnerable();
-
-    // Check if player died
-    if (playerHealth <= 0) {
-        playerHealth = 0;
-        handlePlayerDeath();
-        return true; // Player died
-    }
-
-    // Add screen shake effect for damage feedback
-    screenShake();
-
-    return false; // Player survived
-}
-
-// Function to heal player
-function healPlayer(healAmount) {
-    const oldHealth = playerHealth;
-    playerHealth = Math.min(maxHealth, playerHealth + healAmount);
-
-    console.log(`Player healed for ${healAmount}. Health: ${oldHealth} -> ${playerHealth}`);
-    updateHealthBar();
-
-    return playerHealth - oldHealth; // Return actual amount healed
 }
 
 // Make player temporarily invulnerable
@@ -560,141 +456,6 @@ function showGameOverScreen() {
     app.view.addEventListener('click', restartGame);
 }
 
-// Simple screen shake effect
-function screenShake() {
-    if (!app.stage) return;
-
-    const shakeIntensity = 10;
-    const shakeDuration = 200; // milliseconds
-    let shakeTimer = 0;
-
-    const originalX = app.stage.x;
-    const originalY = app.stage.y;
-
-    const shakeInterval = setInterval(() => {
-        shakeTimer += 16; // Assuming ~60 FPS
-
-        if (shakeTimer >= shakeDuration) {
-            // Reset position and stop shaking
-            app.stage.x = originalX;
-            app.stage.y = originalY;
-            clearInterval(shakeInterval);
-        } else {
-            // Apply random shake
-            const progress = 1 - (shakeTimer / shakeDuration); // Fade out shake
-            const currentIntensity = shakeIntensity * progress;
-
-            app.stage.x = originalX + (Math.random() - 0.5) * currentIntensity;
-            app.stage.y = originalY + (Math.random() - 0.5) * currentIntensity;
-        }
-    }, 16);
-}
-
-// Create death effect (explosion)
-function createDeathEffect() {
-    if (!playerShip) return;
-
-    // Simple explosion effect using particles
-    for (let i = 0; i < 20; i++) {
-        const particle = new PIXI.Graphics();
-        particle.beginFill(Math.random() > 0.5 ? 0xff6600 : 0xff0000);
-        particle.drawCircle(0, 0, Math.random() * 5 + 2);
-        particle.endFill();
-
-        particle.x = playerShip.x;
-        particle.y = playerShip.y;
-
-        // Random velocity
-        particle.vx = (Math.random() - 0.5) * 200;
-        particle.vy = (Math.random() - 0.5) * 200;
-        particle.life = 1.0;
-
-        app.stage.addChild(particle);
-
-        // Animate particle
-        const animateParticle = () => {
-            particle.x += particle.vx * 0.016;
-            particle.y += particle.vy * 0.016;
-            particle.life -= 0.02;
-            particle.alpha = particle.life;
-            particle.scale.set(particle.life);
-
-            if (particle.life <= 0) {
-                app.stage.removeChild(particle);
-            } else {
-                requestAnimationFrame(animateParticle);
-            }
-        };
-
-        requestAnimationFrame(animateParticle);
-    }
-
-    // Hide player ship
-    if (playerShip) {
-        playerShip.visible = false;
-    }
-}
-
-// Restart game function
-function restartGame() {
-    console.log("Restarting game...");
-
-    // Reset game state
-    gameState = 'playing'; // Go directly to playing, skip waiting/countdown
-
-    // Reset health
-    playerHealth = maxHealth;
-    isInvulnerable = false;
-    invulnerabilityTimer = 0;
-
-    // Reset movement
-    floatX = 0;
-    floatY = 0;
-    keys = {}; // Clear all pressed keys
-    inputQueue = { x: [], y: [] }; // Clear input queue
-
-    // Reset world position
-    playerWorldX = 0;
-    playerWorldY = 0;
-
-    // Clear arrays
-    bullets = [];
-    enemies = [];
-
-    // Clear stage completely
-    app.stage.removeChildren();
-
-    // Reset background system
-    existingTiles.clear();
-    lastTileCheckX = 0;
-    lastTileCheckY = 0;
-    backgroundContainer = null;
-
-    // Recreate everything
-    backgroundFill();
-
-    // Recreate player ship
-    playerShip = PIXI.Sprite.from('../../../Data/Ship/ship.png');
-    playerShip.scale.set(0.5);
-    playerShip.x = app.screen.width / 2;
-    playerShip.y = app.screen.height / 2;
-    playerShip.anchor.set(0.5);
-    playerShip.gunPositions = getGunPositions(shipGrid);
-    playerShip.visible = true;
-    playerShip.alpha = 1.0;
-    app.stage.addChild(playerShip);
-
-    // Recreate health UI
-    healthBar = null; // Reset references
-    healthText = null;
-    createHealthUI();
-
-    // Remove any existing click listeners
-    app.view.removeEventListener('click', restartGame);
-
-    console.log("Game restarted successfully!");
-}
-
 // Update invulnerability timer - add this to your main update() function
 function updateInvulnerability(deltaTime) {
     if (isInvulnerable) {
@@ -715,29 +476,6 @@ function updateInvulnerability(deltaTime) {
             }
         }
     }
-}
-
-
-function bulletHitPlayer(bulletDamage = 10) {
-    return takeDamage(bulletDamage, "enemy bullet");
-}
-
-function enemyCollisionDamage(enemyType = "basic") {
-    const damage = enemyType === "basic" ? 20 : 30;
-    return takeDamage(damage, `${enemyType} enemy collision`);
-}
-
-function environmentalDamage(damageAmount = 5) {
-    return takeDamage(damageAmount, "environmental hazard");
-}
-
-// Health powerup function
-function collectHealthPowerup(healAmount = 25) {
-    return healPlayer(healAmount);
-}
-
-function testDamage() {
-    takeDamage(25, "test damage");
 }
 
 document.addEventListener('keydown', function(event) {
@@ -766,7 +504,7 @@ function startGame() {
     //Temporary sprite add player bult ship later
     playerShip = PIXI.Sprite.from('../../../Data/Ship/ship.png');
 
-    playerShip.scale.set(0.5);
+    playerShip.scale.set(shipSize);
 
 
     playerShip.x = app.screen.width / 2;  // 400
@@ -841,17 +579,15 @@ function update() {
     if (gameState !== 'playing') return;
 
     updateMovementInput();
-    updateInvulnerability(frameTime / 1000)
+    updateInvulnerability(frameTime / 1000);
 
+    // Calculate movement
     const moveSpeed = acceleration / frameTime;
-
-// Calculate the length of the movement vector
     const inputLength = Math.sqrt(floatX * floatX + floatY * floatY);
 
     let normalizedFloatX = floatX;
     let normalizedFloatY = floatY;
 
-// If we're moving diagonally, normalize to keep speed consistent
     if (inputLength > 1) {
         normalizedFloatX = floatX / inputLength;
         normalizedFloatY = floatY / inputLength;
@@ -860,20 +596,21 @@ function update() {
     const backgroundMoveX = -normalizedFloatX * moveSpeed;
     const backgroundMoveY = -normalizedFloatY * moveSpeed;
 
+    // UPDATE PLAYER WORLD POSITION - This is the key addition
+    playerWorldX += -backgroundMoveX;
+    playerWorldY += -backgroundMoveY;
 
     moveBackground(backgroundMoveX, backgroundMoveY);
 
-
-    // Calculate angle and rotate ship
+    // Existing rotation code...
     const xDiff = mouseX - playerShip.x;
     const yDiff = mouseY - playerShip.y;
     const angle = Math.atan2(yDiff, xDiff);
-
-    // ADD THIS LINE: Subtract π/2 (90 degrees) because your sprite points up by default
-    playerShip.rotation = angle - (Math.PI * 3) /2;
-
+    playerShip.rotation = angle - (Math.PI * 3) / 2;
 
     updateBullets(frameTime / 1000);
-}
 
+    // Update enemy system
+    updateEnemySystem(frameTime / 1000);
+}
 

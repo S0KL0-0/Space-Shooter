@@ -1,6 +1,6 @@
 // Ship visualization configuration
 const SHIP_RENDER_CONFIG = {
-    cellSize: 64,           // Size of each grid cell in pixels
+    cellSize: 100,           // Size of each grid cell in pixels
     padding: 10,            // Padding around the ship
     backgroundColor: 'transparent', // Background color ('transparent', '#000000', etc.)
     outputFormat: 'png',    // Output format ('png', 'jpeg', 'webp')

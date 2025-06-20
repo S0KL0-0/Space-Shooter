@@ -25,17 +25,10 @@
     null,
     null,
     null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null
-  ],
-  [
-    null,
-    null,
-    null,
+    {
+      "id": "weapon_blaster",
+      "rotation": "UP"
+    },
     null,
     {
       "id": "weapon_blaster",
@@ -43,11 +36,9 @@
     },
     null,
     null,
-    null,
     null
   ],
   [
-    null,
     null,
     null,
     {
@@ -55,7 +46,15 @@
       "rotation": "LEFT"
     },
     {
-      "id": "reactor_basic",
+      "id": "armor_basic",
+      "rotation": "UP"
+    },
+    {
+      "id": "hull_basic",
+      "rotation": "UP"
+    },
+    {
+      "id": "armor_basic",
       "rotation": "UP"
     },
     {
@@ -63,19 +62,24 @@
       "rotation": "RIGHT"
     },
     null,
-    null,
     null
   ],
   [
-    null,
     null,
     null,
     null,
     {
-      "id": "weapon_blaster",
-      "rotation": "DOWN"
+      "id": "hull_basic",
+      "rotation": "UP"
     },
-    null,
+    {
+      "id": "reactor_basic",
+      "rotation": "UP"
+    },
+    {
+      "id": "hull_basic",
+      "rotation": "UP"
+    },
     null,
     null,
     null
@@ -84,9 +88,35 @@
     null,
     null,
     null,
+    {
+      "id": "armor_basic",
+      "rotation": "UP"
+    },
+    {
+      "id": "hull_basic",
+      "rotation": "UP"
+    },
+    {
+      "id": "armor_basic",
+      "rotation": "UP"
+    },
+    null,
+    null,
+    null
+  ],
+  [
     null,
     null,
     null,
+    {
+      "id": "engine_basic",
+      "rotation": "UP"
+    },
+    null,
+    {
+      "id": "engine_basic",
+      "rotation": "UP"
+    },
     null,
     null,
     null
